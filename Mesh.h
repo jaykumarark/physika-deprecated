@@ -5,8 +5,9 @@
 #include <assimp\scene.h>       
 #include <assimp\postprocess.h> 
 #include <glm\glm.hpp>
-
+#include "texture.h"
 #include <vector>
+#include "util.h"
 
 struct Vertex
 {
@@ -31,7 +32,7 @@ public:
 	~Mesh();
 
 	bool LoadMesh(const std::string& Filename);
-	void Render();
+	void Render(int position, int tex, int normal);
 
 private:
 	bool InitFromScene(const aiScene* pScene, const std::string& Filename);
@@ -45,7 +46,7 @@ private:
 		MeshEntry();
 		~MeshEntry();
 
-		bool Init(const std::vector& Vertices, const std::vector& Indices); 
+		void Init(const std::vector<Vertex>& Vertices, const std::vector<unsigned int>& Indices); 
 		
 		GLuint VB;
 		GLuint IB;
@@ -55,7 +56,7 @@ private:
 	};
 
 	std::vector<MeshEntry> m_Entries;
-	std::vector m_Textures;
+	std::vector<Texture*> m_Textures;
 };
 
 
