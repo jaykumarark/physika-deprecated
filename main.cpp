@@ -11,28 +11,41 @@
 #include <math.h>
 #include "Camera.h"
 #include "ParticleSystem.h"
+#include "TrackBall.h"
+#include "pipeline.h"
+#include "cube.h"
+#include "image.h"
+#include "mesh.h"
 
-
-ParticleSystem ps;
 Shader shader_obj;
+Pipeline* p; 
+Camera cam;
+TrackBall* trackBall;
+Mesh* box;
+
+Cube* cube;
 
 int gwidth = 800;
 int gheight = 600; 
-
+float angle;
 //Shader var locations
 int position_loc = -1;			// Initialize location to -1 
 int color_loc= -1;			
 int projection_loc = -1;
 int texture_loc = -1;
+int texcoord_loc = -1;
+int normal_loc = -1;
 //Transformation Matrices
   glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, 0.0));
-
-  Camera cam;
+  glm::mat4 rot = glm::rotate(model, 45.f, glm::vec3(1, 0, 0));
+  
+  
 
 
   //Keyboard variables
   bool keyStates[256];
 
+  
   int lastTime = 0;
 
 
@@ -41,74 +54,48 @@ GLuint vertexBuffers;
 GLuint indexBuffers;
 GLuint colorBuffers;
 GLuint particleBuffers;
-GLuint particleTex;
+GLuint textureId; 
+GLuint texcoord; 
 
 glm::vec3 *partPos; 
 
-glm::vec3 globalPos;
-float gRotateX = 0;
-float gRotateY = 0;
-float gRotateZ = 0;
+ParticleSystem ps;
 
-bool isMouseDown = false;
+glm::vec3 globalPos;
+
 
 const float cubeVerts[] = {
 	  // front
-    -50.0, -50.0,  50.0, 
-     50.0, -50.0,  50.0, 
-     50.0,  50.0,  50.0, 
-    -50.0,  50.0,  50.0, 
-    // back
-    -50.0, -50.0, -50.0, 
-     50.0, -50.0, -50.0, 
-     50.0,  50.0, -50.0, 
-    -50.0,  50.0, -50.0, 
-};
-const GLushort cubeIndices[] = {
-	//front
-	/*0, 1, 2, 
-	2, 3, 0, 
-	//top
-	3, 2, 6, 
-	6, 7, 3, 
-	//back
-	7, 6, 5, 
-	5, 4, 7, 
-	//left
-	4, 0, 3,
-	3, 7, 4, 
-	//right
-	1, 5, 6, 
-	6, 2, 1*/
-
-	//bottom
-	4, 5, 1, 
-	1, 0, 4,
+    -5.0, -5.0,  5.0, 
+     5.0, -5.0,  5.0, 
+     5.0,  5.0,  5.0, 
+    -5.0,  5.0,  5.0, 
 };
 
-GLfloat cube_colors[] = {
-    // front colors
-    1.0, 0.0, 0.0, 1.0f,
-    0.0, 1.0, 0.0, 1.0f,
-    0.0, 0.0, 1.0, 1.0f,
-    1.0, 1.0, 1.0, 1.0f,
-    // back colors
-    1.0, 0.0, 0.0, 1.0f,
-    0.0, 1.0, 0.0, 1.0f,
-    0.0, 0.0, 1.0, 1.0f,
-    0.0, 0.0, 0.0, 1.0f,
+Image* imgTex;
+ GLushort cube_elements[] = {
+    // front
+    0, 1, 2,
+    2, 3, 0,
+ }; 
+
+ GLfloat cube_texcoords[] = {
+    // front
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
   };
 
+bool isMouseDown = false;
 
 
 
 void InitializeProgram()
 {
-	
 	shader_obj.add(GL_VERTEX_SHADER, "vs.glsl");
 	shader_obj.add(GL_FRAGMENT_SHADER, "fs.glsl");
 	shader_obj.CompileProgram();
-	
 	shader_obj.deleteShaders();
 }
 
@@ -116,8 +103,11 @@ void getShaderVarLoc()
 {
 	position_loc = shader_obj.getAttributeLocation("position");
 	color_loc = shader_obj.getAttributeLocation("color");
+	texcoord_loc = shader_obj.getAttributeLocation("texcoord");
 	projection_loc = shader_obj.getUniformLoc("projection");
-	texture_loc = shader_obj.getUniformLoc("tex");
+	texture_loc = shader_obj.getUniformLoc("gtexture");
+	
+	normal_loc = shader_obj.getUniformLoc("normal");
 }
 
 void initCamera(){
@@ -126,46 +116,65 @@ void initCamera(){
 	cam.setFov(60.0f);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(0.1f, 1000.f);
-	cam.setPosition(glm::vec3(0.0, 0.0, 50.0));
+	cam.setPosition(glm::vec3(0, 0, 50));
 	cam.lookAt(glm::vec3(0.0, 0.0, 0.0));
-	cam.setVelocity(20.);
+	cam.setVelocity(20);
 	printf("%d", cam.mMouseX);
 	printf("%d", cam.mMouseY);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
 }
-void InitializeBuffers()
+
+void initBuffers()
 {
-	//Vertex Buffers for the cube
 	glGenBuffers(1, &vertexBuffers);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerts), cubeVerts, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	//VBO for the color
-	glGenBuffers(1, &colorBuffers);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffers);
-	glBufferData(GL_ARRAY_BUFFER, ps.pnum*sizeof(glm::vec3), ps.color, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 	//EBO for the indices
 	glGenBuffers(1, &indexBuffers);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffers);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_elements), cube_elements, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+	//generate texture coords buffers
+	glGenBuffers(1, &texcoord);
+	glBindBuffer(GL_ARRAY_BUFFER, texcoord);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_texcoords), cube_texcoords, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//Generate texture object
+	imgTex = new Image("textures/naruto.png");
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, // target
+	       0,  // level, 0 = base, no minimap,
+	       GL_RGB, // internalformat
+	       imgTex->width(),  // width
+	       imgTex->height(),  // height
+	       0,  // border, always 0 in OpenGL ES
+	       GL_RGB,  // format
+	       GL_UNSIGNED_BYTE, // type
+		   imgTex->data());
+	
 }
+
 
 void initOpengl()
 {
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_POINT_SPRITE);
 	InitializeProgram();
-	InitializeBuffers();
 	initCamera();
-	glPointSize(3.f);
 	getShaderVarLoc();
-	
+	initBuffers();
+	p = new Pipeline(projection_loc, cam.matrix(), glm::vec3(0, 0, 0));
+	trackBall = new TrackBall(gwidth, gheight);
+	cube = new Cube(glm::vec3(10, 10, 10), glm::vec3(0, 0, 0));
+	box = new Mesh();
+	box->LoadMesh("models/GAZEBOobj.obj");
+		
 }
 
 
@@ -194,44 +203,61 @@ void display()
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0, 0.0, 0.0));
 	
-	glm::mat4 m = cam.matrix()* model;
+	glm::mat4 m = cam.matrix() *trackBall->transform()*model;
 	
 	//Pass uniforms to shader
 	if(projection_loc != -1)
 		glUniformMatrix4fv(projection_loc, 1, false, glm::value_ptr(m));
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, particleTex);
-	if(texture_loc != -1)
-		glUniform1i(texture_loc, 0);
-
+	//p->LoadView(cam.matrix());	
+	//p->LoadIdentity();
+	
 
 	
 
 	//Enable the position location in the shader
 	glEnableVertexAttribArray(position_loc);
 	glEnableVertexAttribArray(color_loc);
+	glEnableVertexAttribArray(texcoord_loc);
 	
 	
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glUniform1i(texture_loc, /*GL_TEXTURE*/0);
+
+	glBindBuffer(GL_ARRAY_BUFFER,vertexBuffers);
 	glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffers);
-	glVertexAttribPointer(color_loc, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	
+	glBindBuffer(GL_ARRAY_BUFFER, texcoord);
+	glVertexAttribPointer(texcoord_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffers);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
 	
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
-
+	box->Render(position_loc,texcoord_loc, normal_loc, texture_loc);
+	//cube->render(position_loc, color_loc, texcoord_loc, texture_loc);
+	//glutWireSphere(10, 30, 30);
+	
+	/*p->MoveTo(glm::vec3(25, 0, 0));
+	p->Rotate(angle, glm::vec3(0, 0, 1));
+	p->Save();
+	glutWireSphere(10.f, 30, 30);
+	p->Rotate(angle, glm::vec3(1,0,0));
+	p->MoveTo(glm::vec3(10, 0, 0));
+	p->Retrieve();
+	p->Pass();
+	glutWireSphere(5.0f, 30, 30);*/
+	
 	//Displaying particles starts here
-	glGenBuffers(1, &particleBuffers); 
-	glBindBuffer(GL_ARRAY_BUFFER, particleBuffers);
-	glBufferData(GL_ARRAY_BUFFER, ps.pnum*sizeof(glm::vec3), ps.mPos, GL_STATIC_DRAW);
-	glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glDrawArrays(GL_POINTS, 0, (GLsizei)ps.pnum);			//Draw them to screen
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glGenBuffers(1, &particleBuffers); 
+	//glBindBuffer(GL_ARRAY_BUFFER, particleBuffers);
+	//glBufferData(GL_ARRAY_BUFFER, ps.pnum*sizeof(glm::vec3), ps.mPos, GL_STREAM_DRAW);
+	//glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//glDrawArrays(GL_POINTS, 0, (GLsizei)ps.pnum);			//Draw them to screen
+	//
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//Displaying particles ends here
+	
 	
 	
 	glUseProgram(0);
@@ -274,12 +300,29 @@ void mwheel(int wheel, int direction, int x, int y)
 
 void mouse(int button, int state, int x, int y)
 {
-	
+	if(state == GLUT_DOWN)
+	{
+		trackBall->setBtnState(true);
+		trackBall->trackPoint(x, y);
+		cout<<"onMOuseDown"<<endl;
+		cout<<trackBall->getIsDown();
+	}
+	if(state == GLUT_UP)
+	{
+		trackBall->setBtnState(false);
+		cout<<"onMouseUp"<<endl;
+		cout<<trackBall->getIsDown();
+	}
+}
+
+void passiveMotion(int x, int y)
+{		
+	cam.onMouseMove(x,y);	
 }
 
 void motion(int x, int y)
-{		
-	cam.onMouseMove(x,y);	
+{
+	//trackBall->trackMovement(x, y);
 }
 
 
@@ -307,13 +350,33 @@ void processKeyboard(float dt)
 	{
 		cam.offsetPosition(cam.velocity()*dt*cam.right());
 	}
+
+	if(keyStates['j'] || keyStates['J'])
+	{
+		rot = glm::rotate(rot,-1.f, glm::vec3(0.0, 1.0, 0.0));
+	}
+
+	if(keyStates['l'] || keyStates['L'])
+	{
+		rot = glm::rotate(rot ,1.f, glm::vec3(0.0, 1.0, 0.0));
+	}
+	if(keyStates['k'] || keyStates['k'])
+	{
+		rot = glm::rotate(rot,-1.f, glm::vec3(1.0, 0.0, 0.0));
+	}
+
+	if(keyStates['i'] || keyStates['I'])
+	{
+		rot = glm::rotate(rot ,1.f, glm::vec3(1.0, 0.0, 0.0));
+	}
 	
 }
 
 void idle()
 {
 	float presentTime = glutGet(GLUT_ELAPSED_TIME);
-	float dt= 0.01;
+	float dt= 0.1;
+	angle += 0.2;
 	
 	processKeyboard(dt);
 	ps.simulate(dt, globalPos, glm::vec3(20,10,-5));
@@ -329,8 +392,10 @@ void createGlutCallBacks()
 	glutReshapeFunc(reshape);
 	glutMouseWheelFunc(mwheel);
 	glutMouseFunc(mouse);
-	glutPassiveMotionFunc(motion);
+	glutPassiveMotionFunc(passiveMotion);
+	glutMotionFunc(motion);
 	glutIdleFunc(idle);
+	
 	
 }
 int main(int argc, char** argv)
@@ -339,7 +404,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ACCUM);
 	glutInitWindowSize(gwidth,gheight);
 	glutInitWindowPosition(100, 200);
-	glutCreateWindow("The World - CGT 521");
+	glutCreateWindow("Physika - Particle Systems");
 	createGlutCallBacks();
 	GLenum res = glewInit();
 	if(res != GLEW_OK)

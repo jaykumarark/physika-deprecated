@@ -165,7 +165,7 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& filename)
 
 		// Load a white texture in case the model does not include its own texture
         if (!m_Textures[i]) {
-            m_Textures[i] = new Texture(GL_TEXTURE_2D, "models/white.jpg");
+            m_Textures[i] = new Texture(GL_TEXTURE_2D, "textures/white.jpg");
 
             ret = m_Textures[i]->load();
         }
@@ -174,7 +174,7 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& filename)
 	return ret;
 }
 
-void Mesh::Render(int position, int tex, int normal)
+void Mesh::Render(int position, int tex, int normal, int sample)
 {
 	
     glEnableVertexAttribArray(position);
@@ -192,7 +192,7 @@ void Mesh::Render(int position, int tex, int normal)
         const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
 
         if (MaterialIndex < m_Textures.size() && m_Textures[MaterialIndex]) {
-            m_Textures[MaterialIndex]->bind(GL_TEXTURE0);
+			m_Textures[MaterialIndex]->activate(sample, GL_TEXTURE0, 0);
         }
 
         glDrawElements(GL_TRIANGLES, m_Entries[i].NumIndices, GL_UNSIGNED_INT, 0);

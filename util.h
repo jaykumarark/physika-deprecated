@@ -1,11 +1,17 @@
+#ifndef UTIL_H
+#define UTIL_H
 #include<iostream>
 
-float randomize(float min, float max)
+#define SAFE_DELETE(p) if (p) { delete p; p = NULL; }
+
+#define INVALID_OGL_VALUE 0xFFFFFFFF
+
+inline float randomize(float min, float max)
 {
 	return float(((std::rand() / float(RAND_MAX)) * max) - min);
 }
 
-glm::vec3 randVec(glm::vec3 min, glm::vec3 max)
+inline glm::vec3 randVec(glm::vec3 min, glm::vec3 max)
 {
 	glm::vec3 v; 
 	if(min.x < 0)
@@ -22,3 +28,5 @@ glm::vec3 randVec(glm::vec3 min, glm::vec3 max)
 
 	return v;
 }
+
+#endif UTIL_H

@@ -32,7 +32,7 @@ public:
 	~Mesh();
 
 	bool LoadMesh(const std::string& Filename);
-	void Render(int position, int tex, int normal);
+	void Render(int position, int tex, int normal, int sample);
 
 private:
 	bool InitFromScene(const aiScene* pScene, const std::string& Filename);

@@ -1,6 +1,6 @@
 #include "ParticleSystem.h"
 
-#include "util.h"
+
 ParticleSystem::ParticleSystem(void)
 {
 	//default boundaries

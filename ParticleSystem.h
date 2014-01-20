@@ -3,6 +3,7 @@
 #include "Particle.h"
 #include <vector>
 #include <GL/glew.h>
+#include "util.h"
 
 
 class ParticleSystem

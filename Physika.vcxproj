@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -39,8 +39,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\OGL libraries\assimp--3.0.1270-sdk\include;$(SolutionDir)\libraries\GLM;$(SolutionDir)\libraries\GLEW\include;$(SolutionDir)\libraries\freeglut\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\OGL libraries\assimp--3.0.1270-sdk\lib\assimp_debug-dll_win32;$(SolutionDir)\libraries\GLEW\lib;$(SolutionDir)\libraries\freeglut\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libraries\assimp\include;$(SolutionDir)\libraries\GLM;$(SolutionDir)\libraries\GLEW\include;$(SolutionDir)\libraries\freeglut\include;$(SolutionDir)\libraries\soil\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libraries\assimp\lib\x86;$(SolutionDir)\libraries\GLEW\lib;$(SolutionDir)\libraries\freeglut\lib;$(SolutionDir)\libraries\soil\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -58,7 +58,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -85,11 +85,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="cube.cpp" />
+    <ClCompile Include="image.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
+    <ClCompile Include="pipeline.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="texture.cpp" />
+    <ClCompile Include="trackball.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -98,10 +103,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="cube.h" />
+    <ClInclude Include="image.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="pipeline.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="trackball.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
