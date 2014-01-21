@@ -17,7 +17,7 @@
 #include "image.h"
 #include "mesh.h"
 
-Shader shader_obj;
+Shader* shader;
 Pipeline* p; 
 Camera cam;
 TrackBall* trackBall;
@@ -93,21 +93,12 @@ bool isMouseDown = false;
 
 void InitializeProgram()
 {
-	shader_obj.add(GL_VERTEX_SHADER, "vs.glsl");
-	shader_obj.add(GL_FRAGMENT_SHADER, "fs.glsl");
-	shader_obj.CompileProgram();
-	shader_obj.deleteShaders();
-}
-
-void getShaderVarLoc()
-{
-	position_loc = shader_obj.getAttributeLocation("position");
-	color_loc = shader_obj.getAttributeLocation("color");
-	texcoord_loc = shader_obj.getAttributeLocation("texcoord");
-	projection_loc = shader_obj.getUniformLoc("projection");
-	texture_loc = shader_obj.getUniformLoc("gtexture");
-	
-	normal_loc = shader_obj.getUniformLoc("normal");
+	shader = new Shader();
+	shader->add(GL_VERTEX_SHADER, "vs.glsl");
+	shader->add(GL_FRAGMENT_SHADER, "fs.glsl");
+	shader->CompileProgram();
+	shader->deleteShaders();
+	shader->initShaderVars();
 }
 
 void initCamera(){
@@ -167,7 +158,6 @@ void initOpengl()
 	glEnable(GL_DEPTH_TEST);
 	InitializeProgram();
 	initCamera();
-	getShaderVarLoc();
 	initBuffers();
 	p = new Pipeline(projection_loc, cam.matrix(), glm::vec3(0, 0, 0));
 	trackBall = new TrackBall(gwidth, gheight);
@@ -198,7 +188,7 @@ void display()
 	glClear(GL_ACCUM_BUFFER_BIT);
 
 	//use shader program for subsequent calls
-	shader_obj.useProgram();
+	shader->useProgram();
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0, 0.0, 0.0));
@@ -206,8 +196,8 @@ void display()
 	glm::mat4 m = cam.matrix() *trackBall->transform()*model;
 	
 	//Pass uniforms to shader
-	if(projection_loc != -1)
-		glUniformMatrix4fv(projection_loc, 1, false, glm::value_ptr(m));
+	if(shader->matrixUniform() != -1)
+		glUniformMatrix4fv(shader->matrixUniform(), 1, false, glm::value_ptr(m));
 
 	//p->LoadView(cam.matrix());	
 	//p->LoadIdentity();
@@ -216,25 +206,26 @@ void display()
 	
 
 	//Enable the position location in the shader
-	glEnableVertexAttribArray(position_loc);
-	glEnableVertexAttribArray(color_loc);
-	glEnableVertexAttribArray(texcoord_loc);
+	/*glenablevertexattribarray(position_loc);
+	glenablevertexattribarray(color_loc);
+	glenablevertexattribarray(texcoord_loc);*/
+	shader->enableShaderAttribs();
 	
 	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);
-	glUniform1i(texture_loc, /*GL_TEXTURE*/0);
+	glUniform1i(shader->sampleUniform(), 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER,vertexBuffers);
-	glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(shader->positionAttrib(), 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, texcoord);
-	glVertexAttribPointer(texcoord_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(shader->texcoordAttrib(), 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffers);
 	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
 	
-	box->Render(position_loc,texcoord_loc, normal_loc, texture_loc);
+	box->Render(shader->positionAttrib(),shader->texcoordAttrib(), shader->normalAttrib(), shader->sampleUniform());
 	//cube->render(position_loc, color_loc, texcoord_loc, texture_loc);
 	//glutWireSphere(10, 30, 30);
 	
@@ -262,8 +253,8 @@ void display()
 	
 	glUseProgram(0);
 
-	glDisableVertexAttribArray(position_loc);
-	glDisableVertexAttribArray(color_loc);
+	//glDisableVertexAttribArray(position_loc);
+	//glDisableVertexAttribArray(color_loc);
 	glutPostRedisplay();
 	glutSwapBuffers();
 	glAccum(GL_ACCUM, 0.9f);

@@ -4,8 +4,9 @@
 
 Shader::Shader()
 {
-
 }
+
+
 
 char* Shader::file_read(const char* filename)
 {
@@ -110,4 +111,56 @@ GLint Shader::getUniformLoc(GLchar *varname)
 GLint Shader::getAttributeLocation(std::string varName)
 {
 	return glGetAttribLocation(this->Program, varName.c_str());
+}
+
+
+void Shader::initShaderVars()
+{
+	pos_loc = getAttributeLocation("position");
+	color_loc = getAttributeLocation("color");
+	texcoord_loc = getAttributeLocation("texcoord");
+	normal_loc = getAttributeLocation("normal");
+	matrix_loc = getUniformLoc("projection");
+	sample_loc= getUniformLoc("gtexture");
+}
+
+void Shader::enableShaderAttribs()
+{
+	glEnableVertexAttribArray(pos_loc);
+	glEnableVertexAttribArray(color_loc);
+	glEnableVertexAttribArray(normal_loc);
+	glEnableVertexAttribArray(texcoord_loc);
+}
+
+void Shader::disableShaderAttribs()
+{
+	glDisableVertexAttribArray(pos_loc);
+	glDisableVertexAttribArray(color_loc);
+	glDisableVertexAttribArray(normal_loc);
+	glDisableVertexAttribArray(texcoord_loc);
+}
+
+int Shader::positionAttrib()
+{
+	return pos_loc;
+}
+int Shader::colorAttrib()
+{
+	return color_loc;
+}
+int Shader::normalAttrib()
+{
+	return normal_loc;
+}
+int Shader::texcoordAttrib()
+{
+	return texcoord_loc;
+}
+int Shader::matrixUniform()
+{
+	return matrix_loc;
+}
+int Shader::sampleUniform()
+{
+	return sample_loc;
 }
