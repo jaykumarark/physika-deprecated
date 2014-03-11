@@ -1,5 +1,4 @@
 #include <string>
-#include <stdio.h>
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
@@ -10,24 +9,31 @@
 #include <glm/gtx/transform.hpp>
 #include <math.h>
 #include "Camera.h"
-#include "ParticleSystem.h"
 #include "TrackBall.h"
 #include "pipeline.h"
 #include "cube.h"
 #include "image.h"
 #include "mesh.h"
+#include "grid.h"
+#include <time.h>
+
+#define IDX(i,j,col) j+col*i 
 
 Shader* shader;
 Pipeline* p; 
 Camera cam;
 TrackBall* trackBall;
 Mesh* box;
+Grid* terrain;
 
 Cube* cube;
 
-int gwidth = 800;
-int gheight = 600; 
+int gwidth = 1024;
+int gheight = 768; 
 float angle;
+
+bool isMouseDown = false; 
+
 //Shader var locations
 int position_loc = -1;			// Initialize location to -1 
 int color_loc= -1;			
@@ -38,9 +44,6 @@ int normal_loc = -1;
 //Transformation Matrices
   glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, 0.0));
   glm::mat4 rot = glm::rotate(model, 45.f, glm::vec3(1, 0, 0));
-  
-  
-
 
   //Keyboard variables
   bool keyStates[256];
@@ -48,7 +51,7 @@ int normal_loc = -1;
   
   int lastTime = 0;
 
-
+  
 //Buffers
 GLuint vertexBuffers;
 GLuint indexBuffers;
@@ -57,11 +60,21 @@ GLuint particleBuffers;
 GLuint textureId; 
 GLuint texcoord; 
 
-glm::vec3 *partPos; 
 
-ParticleSystem ps;
+
+
 
 glm::vec3 globalPos;
+
+//Variables for a grid
+vector<glm::vec3> grid;
+vector<glm::vec3> gridColor;
+vector <glm::vec3> gridNormals;
+vector<unsigned short> gridIndices;
+GLuint gridVertexBuffer;
+GLuint gridColorBuffer;
+GLuint gridElementBuffer;
+GLuint gridNormalBuffer;
 
 
 const float cubeVerts[] = {
@@ -87,7 +100,6 @@ Image* imgTex;
     0.0, 1.0,
   };
 
-bool isMouseDown = false;
 
 
 
@@ -104,86 +116,37 @@ void InitializeProgram()
 void initCamera(){
 	cam.setWindowCoords(gwidth, gheight);
 	cam.init();
-	cam.setFov(60.0f);
+	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
-	cam.setNearFar(0.1f, 1000.f);
-	cam.setPosition(glm::vec3(0, 0, 50));
-	cam.lookAt(glm::vec3(0.0, 0.0, 0.0));
-	cam.setVelocity(20);
-	printf("%d", cam.mMouseX);
-	printf("%d", cam.mMouseY);
+	cam.setNearFar(0.1f, 3000.f);
+	cam.setPosition(glm::vec3(50, 100, 50));
+	cam.lookAt(glm::vec3(100.0, 100, 0.0));
+	cam.setVelocity(50);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
-}
-
-void initBuffers()
-{
-	glGenBuffers(1, &vertexBuffers);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffers);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerts), cubeVerts, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//EBO for the indices
-	glGenBuffers(1, &indexBuffers);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffers);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_elements), cube_elements, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	//generate texture coords buffers
-	glGenBuffers(1, &texcoord);
-	glBindBuffer(GL_ARRAY_BUFFER, texcoord);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_texcoords), cube_texcoords, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//Generate texture object
-	imgTex = new Image("textures/naruto.png");
-	glGenTextures(1, &textureId);
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, // target
-	       0,  // level, 0 = base, no minimap,
-	       GL_RGB, // internalformat
-	       imgTex->width(),  // width
-	       imgTex->height(),  // height
-	       0,  // border, always 0 in OpenGL ES
-	       GL_RGB,  // format
-	       GL_UNSIGNED_BYTE, // type
-		   imgTex->data());
-	
 }
 
 
 void initOpengl()
 {
+	isMouseDown = false; 
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 	glEnable(GL_DEPTH_TEST);
 	InitializeProgram();
 	initCamera();
-	initBuffers();
-	p = new Pipeline(projection_loc, cam.matrix(), glm::vec3(0, 0, 0));
 	trackBall = new TrackBall(gwidth, gheight);
-	cube = new Cube(glm::vec3(10, 10, 10), glm::vec3(0, 0, 0));
-	box = new Mesh();
-	box->LoadMesh("models/GAZEBOobj.obj");
+	terrain = new Grid("textures/perlin2.jpg");
 		
 }
 
-
-void initParticles(){
-	ps.setBoundary( glm::vec3(-20, -20.0f, -20.0f), glm::vec3(20.0f, 20.0f, 20.0f));
-	ps.setRandPos(true);
-	ps.setPnum(1000);
-	ps.initMemory();
-	ps.initParticles();
-}
 
 void display()
 {
 	glPolygonMode( GL_BACK, GL_LINE );
 	//clear screen
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	glAccum(GL_RETURN, 0.95f);
+	//glAccum(GL_RETURN, 0.95f);
 
 	glClear(GL_ACCUM_BUFFER_BIT);
 
@@ -199,65 +162,15 @@ void display()
 	if(shader->matrixUniform() != -1)
 		glUniformMatrix4fv(shader->matrixUniform(), 1, false, glm::value_ptr(m));
 
-	//p->LoadView(cam.matrix());	
-	//p->LoadIdentity();
-	
-
-	
-
-	//Enable the position location in the shader
-	/*glenablevertexattribarray(position_loc);
-	glenablevertexattribarray(color_loc);
-	glenablevertexattribarray(texcoord_loc);*/
 	shader->enableShaderAttribs();
 	
 	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	glUniform1i(shader->sampleUniform(), 0);
 
-	glBindBuffer(GL_ARRAY_BUFFER,vertexBuffers);
-	glVertexAttribPointer(shader->positionAttrib(), 3, GL_FLOAT, GL_FALSE, 0, 0);
+	terrain->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib());
 
-	glBindBuffer(GL_ARRAY_BUFFER, texcoord);
-	glVertexAttribPointer(shader->texcoordAttrib(), 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffers);
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
-	
-	box->Render(shader->positionAttrib(),shader->texcoordAttrib(), shader->normalAttrib(), shader->sampleUniform());
-	//cube->render(position_loc, color_loc, texcoord_loc, texture_loc);
-	//glutWireSphere(10, 30, 30);
-	
-	/*p->MoveTo(glm::vec3(25, 0, 0));
-	p->Rotate(angle, glm::vec3(0, 0, 1));
-	p->Save();
-	glutWireSphere(10.f, 30, 30);
-	p->Rotate(angle, glm::vec3(1,0,0));
-	p->MoveTo(glm::vec3(10, 0, 0));
-	p->Retrieve();
-	p->Pass();
-	glutWireSphere(5.0f, 30, 30);*/
-	
-	//Displaying particles starts here
-	//glGenBuffers(1, &particleBuffers); 
-	//glBindBuffer(GL_ARRAY_BUFFER, particleBuffers);
-	//glBufferData(GL_ARRAY_BUFFER, ps.pnum*sizeof(glm::vec3), ps.mPos, GL_STREAM_DRAW);
-	//glVertexAttribPointer(position_loc, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	//glDrawArrays(GL_POINTS, 0, (GLsizei)ps.pnum);			//Draw them to screen
-	//
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//Displaying particles ends here
-	
-	
-	
 	glUseProgram(0);
-
-	//glDisableVertexAttribArray(position_loc);
-	//glDisableVertexAttribArray(color_loc);
 	glutPostRedisplay();
 	glutSwapBuffers();
-	glAccum(GL_ACCUM, 0.9f);
 }
 
 void reshape (int w, int h)
@@ -295,24 +208,25 @@ void mouse(int button, int state, int x, int y)
 	{
 		trackBall->setBtnState(true);
 		trackBall->trackPoint(x, y);
-		cout<<"onMOuseDown"<<endl;
-		cout<<trackBall->getIsDown();
+		isMouseDown = true;
 	}
 	if(state == GLUT_UP)
 	{
 		trackBall->setBtnState(false);
-		cout<<"onMouseUp"<<endl;
-		cout<<trackBall->getIsDown();
+		isMouseDown = true;
 	}
+
 }
 
 void passiveMotion(int x, int y)
 {		
-	cam.onMouseMove(x,y);	
+	
+		
 }
 
 void motion(int x, int y)
 {
+	cam.onMouseMove(x,y);	
 	//trackBall->trackMovement(x, y);
 }
 
@@ -370,7 +284,6 @@ void idle()
 	angle += 0.2;
 	
 	processKeyboard(dt);
-	ps.simulate(dt, globalPos, glm::vec3(20,10,-5));
 	lastTime = presentTime;
 }
 
@@ -395,7 +308,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ACCUM);
 	glutInitWindowSize(gwidth,gheight);
 	glutInitWindowPosition(100, 200);
-	glutCreateWindow("Physika - Particle Systems");
+	glutCreateWindow("Physika - Terrain Generator");
 	createGlutCallBacks();
 	GLenum res = glewInit();
 	if(res != GLEW_OK)
@@ -403,7 +316,6 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
 		return 1;
 	}
-	initParticles();
 	initOpengl();
 	glutMainLoop();
 	return 0;

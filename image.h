@@ -10,6 +10,7 @@ private:
 	unsigned char* image;
 	int mwidth; 
 	int mheight; 
+	float *mHeightMap;
 	void load(std::string filename); 
 public:
 
@@ -17,6 +18,8 @@ public:
 	int width();
 	int height();
 	unsigned char* data();
+	void makeHeightMap();
+	float getColorAt(int x, int y);
 	~Image(void);
 };
 

@@ -165,7 +165,7 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& filename)
 
 		// Load a white texture in case the model does not include its own texture
         if (!m_Textures[i]) {
-            m_Textures[i] = new Texture(GL_TEXTURE_2D, "textures/white.jpg");
+            m_Textures[i] = new Texture(GL_TEXTURE_2D, "textures/blue.png");
 
             ret = m_Textures[i]->load();
         }

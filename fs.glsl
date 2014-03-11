@@ -11,10 +11,5 @@ uniform sampler2D gtexture;
 
 void main()
 {		
-		//vec4 dyncolor = vec4(gl_FragCoord.y, gl_FragCoord.x, gl_FragCoord.z, 1.0);
-		//outputColor = vec4(1.f, 1.f, 1.f, 1.f);
-		//outputColor = color0;
-	
-		vec2 flipped = vec2(texcoord0.x, 1-texcoord0.y);
-		outputColor = texture2D(gtexture, flipped);
+		outputColor = color0;
 }

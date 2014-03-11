@@ -19,12 +19,12 @@ private:
 
 	char* file_read(const char* filename);
 	GLuint CreateShader(GLenum shaderType, const char* strShaderFileData);
-	GLuint pos_loc; 
-	GLuint sample_loc;
-	GLuint normal_loc;
-	GLuint texcoord_loc;
-	GLuint color_loc;
-	GLuint matrix_loc;
+	GLint pos_loc; 
+	GLint sample_loc;
+	GLint normal_loc;
+	GLint texcoord_loc;
+	GLint color_loc;
+	GLint matrix_loc;
 
 
 

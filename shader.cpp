@@ -4,6 +4,12 @@
 
 Shader::Shader()
 {
+	pos_loc = -1;
+	color_loc = -1;
+	texcoord_loc = -1;
+	normal_loc = -1;
+	matrix_loc = -1;
+	sample_loc= -1;
 }
 
 
@@ -111,11 +117,13 @@ GLint Shader::getUniformLoc(GLchar *varname)
 GLint Shader::getAttributeLocation(std::string varName)
 {
 	return glGetAttribLocation(this->Program, varName.c_str());
+	
 }
 
 
 void Shader::initShaderVars()
 {
+
 	pos_loc = getAttributeLocation("position");
 	color_loc = getAttributeLocation("color");
 	texcoord_loc = getAttributeLocation("texcoord");
