@@ -23,10 +23,8 @@ Shader* shader;
 Pipeline* p; 
 Camera cam;
 TrackBall* trackBall;
-Mesh* box;
-Grid* terrain;
 
-Cube* cube;
+Grid* terrain;
 
 int gwidth = 1024;
 int gheight = 768; 
@@ -34,13 +32,7 @@ float angle;
 
 bool isMouseDown = false; 
 
-//Shader var locations
-int position_loc = -1;			// Initialize location to -1 
-int color_loc= -1;			
-int projection_loc = -1;
-int texture_loc = -1;
-int texcoord_loc = -1;
-int normal_loc = -1;
+
 //Transformation Matrices
   glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, 0.0));
   glm::mat4 rot = glm::rotate(model, 45.f, glm::vec3(1, 0, 0));
@@ -50,57 +42,6 @@ int normal_loc = -1;
 
   
   int lastTime = 0;
-
-  
-//Buffers
-GLuint vertexBuffers;
-GLuint indexBuffers;
-GLuint colorBuffers;
-GLuint particleBuffers;
-GLuint textureId; 
-GLuint texcoord; 
-
-
-
-
-
-glm::vec3 globalPos;
-
-//Variables for a grid
-vector<glm::vec3> grid;
-vector<glm::vec3> gridColor;
-vector <glm::vec3> gridNormals;
-vector<unsigned short> gridIndices;
-GLuint gridVertexBuffer;
-GLuint gridColorBuffer;
-GLuint gridElementBuffer;
-GLuint gridNormalBuffer;
-
-
-const float cubeVerts[] = {
-	  // front
-    -5.0, -5.0,  5.0, 
-     5.0, -5.0,  5.0, 
-     5.0,  5.0,  5.0, 
-    -5.0,  5.0,  5.0, 
-};
-
-Image* imgTex;
- GLushort cube_elements[] = {
-    // front
-    0, 1, 2,
-    2, 3, 0,
- }; 
-
- GLfloat cube_texcoords[] = {
-    // front
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
-    0.0, 1.0,
-  };
-
-
 
 
 void InitializeProgram()
