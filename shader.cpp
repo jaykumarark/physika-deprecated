@@ -10,6 +10,7 @@ Shader::Shader()
 	normal_loc = -1;
 	matrix_loc = -1;
 	sample_loc= -1;
+	lightPos_loc = -1;
 }
 
 
@@ -130,6 +131,7 @@ void Shader::initShaderVars()
 	normal_loc = getAttributeLocation("normal");
 	matrix_loc = getUniformLoc("projection");
 	sample_loc= getUniformLoc("gtexture");
+	lightPos_loc = getUniformLoc("lightpos");
 }
 
 void Shader::enableShaderAttribs()
@@ -167,6 +169,10 @@ int Shader::texcoordAttrib()
 int Shader::matrixUniform()
 {
 	return matrix_loc;
+}
+int Shader::lightPos()
+{
+	return lightPos_loc;
 }
 int Shader::sampleUniform()
 {

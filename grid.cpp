@@ -36,8 +36,8 @@ void Grid::initGrid()
 
 		}
 	}
-	//create indices for the grid
 
+	//create indices for the grid
 	for( int j = 0; j < gridY-1 ; j++)
 	{
 
@@ -51,34 +51,67 @@ void Grid::initGrid()
 
 			m_indices.push_back(v1);
 			m_indices.push_back(v6);
-			m_indices.push_back(v7);
-			
-			m_indices.push_back(v1);
-			m_indices.push_back(v7);
 			m_indices.push_back(v2);
+			
+			m_indices.push_back(v2);
+			m_indices.push_back(v6);
+			m_indices.push_back(v7);
 			
 		}
 	}
 
-	//calculate normals for the each face
-	for( int j = 0; j < gridY-1 ; j++)
-	{
+	std::vector<glm::vec3> unnormalized;
 
+
+	//calculate normals for the each face
+	/*for( int j = 0; j < gridY-1 ; j++)
+	{
 		for( int i = 0; i < gridX-1; i++)
 		{
 			int v1 = i + j*gridX;
 			int v2 = (i + 1) + j*gridX;
 			int v6 = i+ (j+1)*gridX;
 
-			glm::vec3 vertex1 = m_vertices[v1];
-			glm::vec3 vertex2 = m_vertices[v2];
-			glm::vec3 vertex6 = m_vertices[v6];
+			glm::vec3 A = m_vertices[v1];
+			glm::vec3 C = m_vertices[v2];
+			glm::vec3 B = m_vertices[v6];
 
-			glm::vec3 vector1 = vertex1 - vertex6; 
-			glm::vec3 vector2 = vertex6 - vertex2; 
-
-			m_normals.push_back(glm::cross(vector1, vector2));			
+			glm::vec3 AB = B-A; 
+			glm::vec3 AC = C-A; 
+			unnormalized.push_back(glm::cross(AB, AC));			
 		}
+
+	}*/
+
+	//initialize m_normals
+	for(int i = 0 ; i < m_vertices.size();i++)
+	{
+		m_normals.push_back(glm::vec3(0,0,0));
+	}
+
+	for(int i = 0; i < m_indices.size();i+=3)
+	{
+		unsigned int idx1 = m_indices[i];
+		unsigned int idx2 = m_indices[i+1];
+		unsigned int idx3 = m_indices[i+2];
+
+		glm::vec3 A = m_vertices[idx1];
+		glm::vec3 B = m_vertices[idx2];
+		glm::vec3 C = m_vertices[idx3];
+
+		glm::vec3 AB = B-A; 
+		glm::vec3 AC = C-A; 
+		glm::vec3 cross = glm::cross(AB, AC);
+
+		m_normals[idx1] += cross;
+		m_normals[idx2] += cross;
+		m_normals[idx3] += cross;
+
+	}
+
+	for(int i = 0 ; i < m_vertices.size();i++)
+	{
+		m_normals[i] = glm::normalize(m_normals[i]);
 	}
 }
 
@@ -111,7 +144,7 @@ void Grid::initBuffers()
 
 void Grid::render(int pos, int color, int normal)
 {
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	glPolygonMode( GL_BACK, GL_LINE );
 	glBindBuffer(GL_ARRAY_BUFFER, m_vb);
 	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	

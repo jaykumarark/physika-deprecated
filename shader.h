@@ -25,6 +25,7 @@ private:
 	GLint texcoord_loc;
 	GLint color_loc;
 	GLint matrix_loc;
+	GLuint lightPos_loc;
 
 
 
@@ -45,6 +46,7 @@ public:
 	int colorAttrib();
 	int sampleUniform();
 	int matrixUniform();
+	int lightPos();
 
 
 

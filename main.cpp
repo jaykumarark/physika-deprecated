@@ -86,8 +86,7 @@ void display()
 	//clear screen
 	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	//glAccum(GL_RETURN, 0.95f);
+
 
 	glClear(GL_ACCUM_BUFFER_BIT);
 
@@ -97,15 +96,15 @@ void display()
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0, 0.0, 0.0));
 	
-	glm::mat4 m = cam.matrix() *trackBall->transform()*model;
+	glm::mat4 m = cam.matrix()*model;
 	
 	//Pass uniforms to shader
 	if(shader->matrixUniform() != -1)
 		glUniformMatrix4fv(shader->matrixUniform(), 1, false, glm::value_ptr(m));
+	if(shader->lightPos() != -1)
+		glUniform3fv(shader->lightPos(), 1, glm::value_ptr(cam.position()));
 
 	shader->enableShaderAttribs();
-	
-	
 
 	terrain->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib());
 
