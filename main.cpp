@@ -15,16 +15,15 @@
 #include "image.h"
 #include "mesh.h"
 #include "grid.h"
+#include "voxelgrid.h"
 #include <time.h>
-
-#define IDX(i,j,col) j+col*i 
 
 Shader* shader;
 Pipeline* p; 
 Camera cam;
 TrackBall* trackBall;
-
 Grid* terrain;
+VoxelGrid* voxel;
 
 int gwidth = 1024;
 int gheight = 768; 
@@ -60,8 +59,8 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(0.1f, 3000.f);
-	cam.setPosition(glm::vec3(50, 100, 50));
-	cam.lookAt(glm::vec3(100.0, 100, 0.0));
+	cam.setPosition(glm::vec3(0, 0, 20));
+	cam.lookAt(glm::vec3(0.0, 0, 0.0));
 	cam.setVelocity(50);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
 }
@@ -76,6 +75,8 @@ void initOpengl()
 	initCamera();
 	trackBall = new TrackBall(gwidth, gheight);
 	terrain = new Grid("textures/perlin2.jpg");
+	voxel = new VoxelGrid(128, 128, 64, 64);
+	
 		
 }
 
@@ -86,8 +87,6 @@ void display()
 	//clear screen
 	glClearColor(0.11f, 0.11f, 0.11f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
 	glClear(GL_ACCUM_BUFFER_BIT);
 
 	//use shader program for subsequent calls
@@ -105,8 +104,9 @@ void display()
 		glUniform3fv(shader->lightPos(), 1, glm::value_ptr(cam.position()));
 
 	shader->enableShaderAttribs();
-
-	terrain->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib());
+	glPointSize(2.0);
+	voxel->render(shader->positionAttrib());
+	//terrain->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib());
 
 	glUseProgram(0);
 	glutPostRedisplay();

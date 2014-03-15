@@ -62,27 +62,6 @@ void Grid::initGrid()
 
 	std::vector<glm::vec3> unnormalized;
 
-
-	//calculate normals for the each face
-	/*for( int j = 0; j < gridY-1 ; j++)
-	{
-		for( int i = 0; i < gridX-1; i++)
-		{
-			int v1 = i + j*gridX;
-			int v2 = (i + 1) + j*gridX;
-			int v6 = i+ (j+1)*gridX;
-
-			glm::vec3 A = m_vertices[v1];
-			glm::vec3 C = m_vertices[v2];
-			glm::vec3 B = m_vertices[v6];
-
-			glm::vec3 AB = B-A; 
-			glm::vec3 AC = C-A; 
-			unnormalized.push_back(glm::cross(AB, AC));			
-		}
-
-	}*/
-
 	//initialize m_normals
 	for(int i = 0 ; i < m_vertices.size();i++)
 	{
@@ -156,7 +135,7 @@ void Grid::render(int pos, int color, int normal)
 	
 	glFrontFace(GL_CW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
-	glDrawElements(GL_TRIANGLES,m_indices.size(), GL_UNSIGNED_SHORT, (void*)0);
+	glDrawElements(GL_POINTS,m_indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 }
 
 Grid::~Grid(void)

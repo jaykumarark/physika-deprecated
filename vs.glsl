@@ -16,7 +16,7 @@ out vec3 light;
 void main()
 {
 	gl_Position = projection * vec4(position, 1.0f);
-	light = position-lightpos;
+	light = position-vec3(200, 200, -300);
 	texcoord0 = texcoord; 
 	normal0 = normal;
 	color0 = vec4(color, 1.0);
