@@ -135,7 +135,7 @@ void Grid::render(int pos, int color, int normal)
 	
 	glFrontFace(GL_CW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
-	glDrawElements(GL_POINTS,m_indices.size(), GL_UNSIGNED_SHORT, (void*)0);
+	glDrawElements(GL_TRIANGLES,m_indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 }
 
 Grid::~Grid(void)

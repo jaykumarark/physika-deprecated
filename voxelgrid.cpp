@@ -24,12 +24,13 @@ void VoxelGrid::createGrid()
 	//generate vertices
 	for(int k = 0 ; k <= zpts; k++)
 	{
-		for (int i = 0; i <= xpts;i++)
+		for (int i = 0; i <= ypts;i++)
 		{
-			for(int j = 0; j <=ypts; j++)
+			for(int j = 0; j <=(xpts); j++)
 			{
-				glm::vec3 v = glm::vec3(i*m_side, -j*m_side, -k*m_side);
+				glm::vec3 v = glm::vec3(j*m_side, -i*m_side, -k*m_side);
 				std::cout<<"("<<i<<","<<j<<","<<k<<") = "<<idx(i, j, k, len, area)<<std::endl;
+				std::cout<<"("<<v.x<<","<<v.y<<","<<v.z<<") = "<<idx(i, j, k, len, area)<<std::endl;
 				m_vertices.push_back(v);
 			}
 		}
