@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <math.h>
 
 using namespace std;
 
@@ -12,26 +13,23 @@ class TrackBall
 private:
 	int mWidth;
 	int mHeight;
-	glm::vec3 v1;		//init vector
-	glm::vec3 v2;		//final vector
-	glm::vec3 twoDto3D(int x, int y);
+	glm::vec3 currPoint; 
+	glm::vec3 lastPoint;
 	float rotateStep;
 	bool isDown;
-	bool isMove;
-	glm::mat4 currRot; 
-	glm::mat4 lastRot;
-	glm::mat4 transformation;
+	glm::mat4 m_rotate;
+	
 	glm::mat4 computeCurrRot();
-
+	glm::vec3 twoDto3D(int x, int y);
+	void print(glm::vec3 v);
+	float mag(glm::vec3);
 
 public:
 	TrackBall(int width, int height);
-	void trackPoint(int x, int y);
-	void trackMovement(int x, int y);
-	void matrix();
-	void setBtnState(bool state);
-	bool getIsDown();
-	glm::mat4 transform();
+	glm::mat4 matrix();
+	void mouseDown(int x, int y);
+	void mouseMove(int x, int y);
+	void mouseUp();
 	~TrackBall(void);
 };
 

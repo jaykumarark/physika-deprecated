@@ -29,9 +29,8 @@ NewGrid* plane;
 
 int gwidth = 1024;
 int gheight = 768; 
-float angle;
+float angle = 0.f;
 
-bool isMouseDown = false; 
 
 
 //Transformation Matrices
@@ -69,7 +68,6 @@ void initCamera(){
 
 void initOpengl()
 {
-	isMouseDown = false; 
 	lastTime = glutGet(GLUT_ELAPSED_TIME);
 	glEnable(GL_DEPTH_TEST);
 	InitializeProgram();
@@ -95,7 +93,8 @@ void display()
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0, 0.0, 0.0));
 	
-	glm::mat4 m = cam.matrix()*model;
+	
+	glm::mat4 m = cam.matrix()*trackBall->matrix()*model;
 	
 	//Pass uniforms to shader
 	if(shader->matrixUniform() != -1)
@@ -146,14 +145,12 @@ void mouse(int button, int state, int x, int y)
 {
 	if(state == GLUT_DOWN)
 	{
-		trackBall->setBtnState(true);
-		trackBall->trackPoint(x, y);
-		isMouseDown = true;
+		trackBall->mouseDown(x, y);
+		//trackBall->setBtnState(true);
 	}
 	if(state == GLUT_UP)
 	{
-		trackBall->setBtnState(false);
-		isMouseDown = true;
+		trackBall->mouseUp();
 	}
 
 }
@@ -166,8 +163,9 @@ void passiveMotion(int x, int y)
 
 void motion(int x, int y)
 {
-	cam.onMouseMove(x,y);	
-	//trackBall->trackMovement(x, y);
+	trackBall->mouseMove(x, y);
+	//cam.onMouseMove(x,y);	
+	
 }
 
 
@@ -221,7 +219,7 @@ void idle()
 {
 	float presentTime = glutGet(GLUT_ELAPSED_TIME);
 	float dt= 0.1;
-	angle += 0.2;
+	angle += 1.f;
 	
 	processKeyboard(dt);
 	lastTime = presentTime;

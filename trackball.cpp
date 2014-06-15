@@ -5,93 +5,71 @@ TrackBall::TrackBall(int width, int height)
 {
 	mWidth = width; 
 	mHeight = height;
-	rotateStep = 5;
+	rotateStep = 50.f;
 	isDown = false;
-	isMove = false;
-	lastRot = glm::mat4(1);
-	currRot = glm::mat4(1);
+	m_rotate = glm::mat4(1);
+	lastPoint = glm::vec3(0,0,0);
+	currPoint = glm::vec3(0,0,0);
 }
+TrackBall::~TrackBall(void){}
 
-void TrackBall::trackPoint(int x, int y)
+void TrackBall::mouseDown(int x, int y)
 {
-	if(isDown){
-		v1 = twoDto3D(x, y);
-		lastRot = currRot;
-
-	cout<<"Init Point"<<endl;
-	cout<<v1.x<<endl;
-	cout<<v1.y<<endl;
-	cout<<v1.z<<endl;
-	}
+	isDown = true;
+	lastPoint = twoDto3D(x, y);
 }
 
-bool TrackBall::getIsDown()
-{
-	return isDown;
-}
-
-void TrackBall::trackMovement(int x, int y)
-{
-	if(isDown){
-		v2 = twoDto3D(x, y);
-
-	cout<<"Final Point"<<endl;
-	cout<<v2.x<<endl;
-	cout<<v2.y<<endl;
-	cout<<v2.z<<endl;
-	matrix();
-	}
-}
-
-void TrackBall::setBtnState(bool state)
-{
-	isDown = state;
-}
-
-glm::mat4 TrackBall::computeCurrRot()
-{
-	glm::mat4 m = glm::mat4(1);
-	if(isDown){
-		glm::vec3 axis = glm::cross(v2, v1);
-		glm::vec3 direction = v2 - v1; 
-		float velocity = direction.length();
-		float angle = velocity * rotateStep;
-		m = glm::rotate(m, angle, axis);
-	}
-	return m; 
-}
-
-/*
-compute the rotation matrix about the axis running
-between v1 and v2
-*/
-void TrackBall::matrix()
+void TrackBall::mouseMove(int x, int y)
 {
 	if(isDown)
 	{
-		currRot = computeCurrRot();
+		currPoint = twoDto3D(x,y);
+
+		glm::vec3 dir = currPoint - lastPoint;
+		float vel = mag(dir);
+		if(vel > 0.0001)
+		{
+			glm::vec3 axis = glm::cross(currPoint, lastPoint);
+			float angle = vel * 90;
+			print(currPoint);
+			cout<<"vel: "<<vel;
+			lastPoint = currPoint;
+			m_rotate = glm::rotate(glm::mat4(1),angle, axis);
+		}
 	}
-	transformation = currRot * lastRot;
 }
 
-glm::mat4 TrackBall::transform()
+void TrackBall::mouseUp()
 {
-	return transformation;
+	isDown = false;
 }
 
-TrackBall::~TrackBall(void)
+float TrackBall::mag(glm::vec3 v)
 {
-
+	return sqrt((v.x*v.x)+(v.y*v.y)+(v.z*v.z));
 }
 
 glm::vec3 TrackBall::twoDto3D(int x, int y)
 {
 	glm::vec3 v = glm::vec3();
-	v.x = (2*(float)x - mWidth) / mWidth;
-	v.y = (mHeight- 2*(float)y)/mHeight;
+	v.x = (2*(float)x - float(mWidth)) / float(mWidth);
+	v.y = (float(mHeight)- 2*(float)y)/float(mHeight);
 	float d = sqrt((v.x*v.x)+(v.y*v.y));
 	d = (d<1.0f)?d:1.0f;
-	v.z = sqrt(1-d*d);
+	v.z = sqrt(1-(d*d));
 	v = glm::normalize(v);
 	return v;
+}
+
+glm::mat4 TrackBall::matrix()
+{
+	return m_rotate;
+}
+
+
+void TrackBall::print(glm::vec3 v)
+{
+	cout<<"x: "<<v.x<<endl;
+	cout<<"y: "<<v.y<<endl;
+	cout<<"z: "<<v.z<<endl;
 }
