@@ -57,7 +57,7 @@
     <ClCompile Include="voxelgrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OApplication.cpp">
+    <ClCompile Include="NewGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,6 +66,12 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="vs.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="gridVS.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="gridFS.glsl">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
@@ -109,7 +115,7 @@
     <ClInclude Include="voxelgrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OApplication.h">
+    <ClInclude Include="NewGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

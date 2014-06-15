@@ -15,6 +15,7 @@
 #include "image.h"
 #include "mesh.h"
 #include "grid.h"
+#include "NewGrid.h"
 #include <time.h>
 
 Shader* shader;
@@ -22,6 +23,8 @@ Pipeline* p;
 Camera cam;
 TrackBall* trackBall;
 Grid* terrain;
+NewGrid* plane; 
+
 
 
 int gwidth = 1024;
@@ -45,8 +48,8 @@ bool isMouseDown = false;
 void InitializeProgram()
 {
 	shader = new Shader();
-	shader->add(GL_VERTEX_SHADER, "vs.glsl");
-	shader->add(GL_FRAGMENT_SHADER, "fs.glsl");
+	shader->add(GL_VERTEX_SHADER, "gridVS.glsl");
+	shader->add(GL_FRAGMENT_SHADER, "gridFS.glsl");
 	shader->CompileProgram();
 	shader->deleteShaders();
 	shader->initShaderVars();
@@ -73,15 +76,14 @@ void initOpengl()
 	initCamera();
 	trackBall = new TrackBall(gwidth, gheight);
 	terrain = new Grid("textures/perlin2.jpg");
-	
-	
+	plane = new NewGrid(glm::vec3(0,0,0), 128, 128, 8);
 		
 }
 
 
 void display()
 {
-	glPolygonMode( GL_BACK, GL_LINE );
+	//glPolygonMode( GL_BACK, GL_LINE );
 	//clear screen
 	glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -103,7 +105,8 @@ void display()
 
 	shader->enableShaderAttribs();
 	glPointSize(2.0);
-	terrain->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib());
+	//terrain->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib());
+	plane->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib(), shader->texcoordAttrib(), shader->sampleUniform());
 
 	glUseProgram(0);
 	glutPostRedisplay();
