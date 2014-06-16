@@ -13,8 +13,7 @@ class TrackBall
 private:
 	int mWidth;
 	int mHeight;
-	glm::vec3 currPoint; 
-	glm::vec3 lastPoint;
+	
 	float rotateStep;
 	bool isDown;
 	glm::mat4 m_rotate;
@@ -24,6 +23,9 @@ private:
 	void print(glm::vec3 v);
 	float mag(glm::vec3);
 
+	float lastAngle;
+	float newAngle;
+
 public:
 	TrackBall(int width, int height);
 	glm::mat4 matrix();
@@ -31,5 +33,9 @@ public:
 	void mouseMove(int x, int y);
 	void mouseUp();
 	~TrackBall(void);
+
+	glm::vec3 currPoint; 
+	glm::vec3 m_axis;
+	glm::vec3 lastPoint;
 };
 

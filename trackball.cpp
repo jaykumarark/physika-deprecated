@@ -5,11 +5,13 @@ TrackBall::TrackBall(int width, int height)
 {
 	mWidth = width; 
 	mHeight = height;
-	rotateStep = 50.f;
+	rotateStep = 1.f;
 	isDown = false;
 	m_rotate = glm::mat4(1);
 	lastPoint = glm::vec3(0,0,0);
 	currPoint = glm::vec3(0,0,0);
+	lastAngle = 0;
+	newAngle = 0 ;
 }
 TrackBall::~TrackBall(void){}
 
@@ -29,12 +31,15 @@ void TrackBall::mouseMove(int x, int y)
 		float vel = mag(dir);
 		if(vel > 0.0001)
 		{
-			glm::vec3 axis = glm::cross(currPoint, lastPoint);
-			float angle = vel * 90;
+			m_axis = glm::cross(lastPoint, currPoint);
+			lastPoint = glm::normalize(lastPoint);
+			currPoint = glm::normalize(currPoint);
+			newAngle = asin(mag(m_axis)/(mag(lastPoint)*mag(currPoint)));
+			glm::dot(lastPoint, currPoint);
 			print(currPoint);
-			cout<<"vel: "<<vel;
-			lastPoint = currPoint;
-			m_rotate = glm::rotate(glm::mat4(1),angle, axis);
+			cout<<"angle: "<<newAngle <<endl;
+			m_rotate = glm::rotate(glm::mat4(1),newAngle + lastAngle,m_axis);
+			lastAngle += newAngle;
 		}
 	}
 }
@@ -42,6 +47,8 @@ void TrackBall::mouseMove(int x, int y)
 void TrackBall::mouseUp()
 {
 	isDown = false;
+	lastAngle += newAngle;
+
 }
 
 float TrackBall::mag(glm::vec3 v)
@@ -65,7 +72,6 @@ glm::mat4 TrackBall::matrix()
 {
 	return m_rotate;
 }
-
 
 void TrackBall::print(glm::vec3 v)
 {

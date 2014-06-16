@@ -108,6 +108,7 @@ void display()
 	plane->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib(), shader->texcoordAttrib(), shader->sampleUniform());
 
 	glUseProgram(0);
+
 	glutPostRedisplay();
 	glutSwapBuffers();
 }
