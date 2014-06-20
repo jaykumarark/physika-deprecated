@@ -174,9 +174,21 @@ Camera::Camera(void):
 
 	void Camera::onMouseMove(int x, int y)
 	{
+		if(isMouseDown){
 			float deltaX = (x - mMouseX);
 			float deltaY = (y - mMouseY);
 			mMouseX = x; 
 			mMouseY = y;	
 			offsetOrientation(deltaY, deltaX);
+		}
+	}
+
+	void Camera::onMouseDown()
+	{
+		isMouseDown = true;
+	}
+
+	void Camera::onMouseUp()
+	{
+		isMouseDown = false;
 	}

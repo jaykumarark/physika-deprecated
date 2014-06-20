@@ -15,7 +15,7 @@
 #include "image.h"
 #include "mesh.h"
 #include "grid.h"
-#include "NewGrid.h"
+#include "PlaneGrid.h"
 #include <time.h>
 
 Shader* shader;
@@ -23,7 +23,8 @@ Pipeline* p;
 Camera cam;
 TrackBall* trackBall;
 Grid* terrain;
-NewGrid* plane; 
+PlaneGrid* plane; 
+Mesh* mesh;
 
 
 
@@ -47,8 +48,8 @@ float angle = 0.f;
 void InitializeProgram()
 {
 	shader = new Shader();
-	shader->add(GL_VERTEX_SHADER, "gridVS.glsl");
-	shader->add(GL_FRAGMENT_SHADER, "gridFS.glsl");
+	shader->add(GL_VERTEX_SHADER, "vs.glsl");
+	shader->add(GL_FRAGMENT_SHADER, "fs.glsl");
 	shader->CompileProgram();
 	shader->deleteShaders();
 	shader->initShaderVars();
@@ -60,9 +61,9 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(0.1f, 3000.f);
-	cam.setPosition(glm::vec3(0, 0, 20));
+	cam.setPosition(glm::vec3(0, 0, 10));
 	cam.lookAt(glm::vec3(0.0, 0, 0.0));
-	cam.setVelocity(100);
+	cam.setVelocity(5);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
 }
 
@@ -74,7 +75,9 @@ void initOpengl()
 	initCamera();
 	trackBall = new TrackBall(gwidth, gheight);
 	terrain = new Grid("textures/perlin2.jpg");
-	plane = new NewGrid(glm::vec3(0,0,0), 128, 128, 8);
+	plane = new PlaneGrid(glm::vec3(0,0,0), 512, 512);
+	mesh = new Mesh(); 
+	mesh->LoadMesh("models/teapot.obj");
 		
 }
 
@@ -83,7 +86,7 @@ void display()
 {
 	//glPolygonMode( GL_BACK, GL_LINE );
 	//clear screen
-	glClearColor(0.15f, 0.15f, 0.15f, 1.0f);
+	glClearColor(1.f, 1.f, 1.f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClear(GL_ACCUM_BUFFER_BIT);
 
@@ -105,7 +108,8 @@ void display()
 	shader->enableShaderAttribs();
 	glPointSize(2.0);
 	//terrain->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib());
-	plane->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib(), shader->texcoordAttrib(), shader->sampleUniform());
+	//plane->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib(), shader->texcoordAttrib(), shader->sampleUniform());
+	mesh->Render(shader->positionAttrib(), shader->texcoordAttrib(),shader->normalAttrib(), shader->sampleUniform());
 
 	glUseProgram(0);
 
@@ -144,28 +148,34 @@ void mwheel(int wheel, int direction, int x, int y)
 
 void mouse(int button, int state, int x, int y)
 {
-	if(state == GLUT_DOWN)
+	if(state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)
 	{
 		trackBall->mouseDown(x, y);
-		//trackBall->setBtnState(true);
 	}
-	if(state == GLUT_UP)
+	if(state == GLUT_UP && button == GLUT_LEFT_BUTTON)
 	{
 		trackBall->mouseUp();
 	}
 
+	if(state == GLUT_DOWN && button == GLUT_RIGHT_BUTTON)
+	{
+		cam.onMouseDown();
+	}
+	if(state == GLUT_UP && button == GLUT_RIGHT_BUTTON)
+	{
+		cam.onMouseUp();
+	}
 }
 
 void passiveMotion(int x, int y)
 {		
-	
-		
+			
 }
 
 void motion(int x, int y)
 {
 	trackBall->mouseMove(x, y);
-	//cam.onMouseMove(x,y);	
+	cam.onMouseMove(x,y);	
 	
 }
 

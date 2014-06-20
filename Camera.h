@@ -5,6 +5,7 @@
 class Camera
 {
 private:
+	bool isMouseDown;
 	glm::vec3 mpos;
 	float mhAngle; 
 	float mvAngle; 
@@ -53,6 +54,8 @@ public:
 	void setWindowCoords(int w, int h);
 	void setMouseCoords(int x, int y);
 	void Camera::onMouseMove(int x, int y);
+	void Camera::onMouseDown();
+	void Camera::onMouseUp();
 	
 
 };

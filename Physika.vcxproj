@@ -94,6 +94,7 @@
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="pipeline.cpp" />
+    <ClCompile Include="PlaneGrid.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="trackball.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="pipeline.h" />
+    <ClInclude Include="PlaneGrid.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="trackball.h" />
