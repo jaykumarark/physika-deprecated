@@ -101,6 +101,8 @@
     <ClCompile Include="voxelgrid.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="diffuseFS.glsl" />
+    <None Include="diffuseVS.glsl" />
     <None Include="fs.glsl" />
     <None Include="gridFS.glsl" />
     <None Include="gridVS.glsl" />

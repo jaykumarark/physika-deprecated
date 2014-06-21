@@ -77,6 +77,12 @@
     <None Include="gridFS.glsl">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="diffuseFS.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="diffuseVS.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ParticleSystem.h">

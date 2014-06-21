@@ -19,17 +19,24 @@ private:
 
 	char* file_read(const char* filename);
 	GLuint CreateShader(GLenum shaderType, const char* strShaderFileData);
+
+
+
+
+public:
 	GLint pos_loc; 
 	GLint sample_loc;
 	GLint normal_loc;
 	GLint texcoord_loc;
 	GLint color_loc;
-	GLint matrix_loc;
+	GLint mv_loc;
+	GLint proj_loc;
+	GLint mvp_loc;
 	GLuint lightPos_loc;
+	GLint normat_loc;	//normal matrix
+	GLint kdloc;		//diffuse reflectivity
+	GLint ldloc;		//light source intensity
 
-
-
-public:
 	Shader();
 	void enableShaderAttribs();
 	void disableShaderAttribs();

@@ -8,7 +8,7 @@ Shader::Shader()
 	color_loc = -1;
 	texcoord_loc = -1;
 	normal_loc = -1;
-	matrix_loc = -1;
+
 	sample_loc= -1;
 	lightPos_loc = -1;
 }
@@ -125,13 +125,19 @@ GLint Shader::getAttributeLocation(std::string varName)
 void Shader::initShaderVars()
 {
 
-	pos_loc = getAttributeLocation("position");
-	color_loc = getAttributeLocation("color");
-	texcoord_loc = getAttributeLocation("texcoord");
-	normal_loc = getAttributeLocation("normal");
-	matrix_loc = getUniformLoc("projection");
+	pos_loc = getAttributeLocation("VertexPosition");
+	color_loc = getAttributeLocation("VertexColor");
+	texcoord_loc = getAttributeLocation("VertexTexture");
+	normal_loc = getAttributeLocation("VertexNormal");
+
+	proj_loc = getUniformLoc("ProjectionMatrix");
+	mv_loc = getUniformLoc("ModelViewMatrix");
+	mvp_loc = getUniformLoc("mvp");
 	sample_loc= getUniformLoc("gtexture");
-	lightPos_loc = getUniformLoc("lightpos");
+	lightPos_loc = getUniformLoc("lightPosition");
+	normat_loc = getUniformLoc("NormalMatrix");
+	kdloc = getUniformLoc("kd");
+	ldloc = getUniformLoc("ld");
 }
 
 void Shader::enableShaderAttribs()
@@ -168,7 +174,7 @@ int Shader::texcoordAttrib()
 }
 int Shader::matrixUniform()
 {
-	return matrix_loc;
+	return proj_loc;
 }
 int Shader::lightPos()
 {

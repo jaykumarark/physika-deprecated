@@ -48,8 +48,8 @@ float angle = 0.f;
 void InitializeProgram()
 {
 	shader = new Shader();
-	shader->add(GL_VERTEX_SHADER, "vs.glsl");
-	shader->add(GL_FRAGMENT_SHADER, "fs.glsl");
+	shader->add(GL_VERTEX_SHADER, "diffuseVS.glsl");
+	shader->add(GL_FRAGMENT_SHADER, "diffuseFS.glsl");
 	shader->CompileProgram();
 	shader->deleteShaders();
 	shader->initShaderVars();
@@ -61,9 +61,9 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(0.1f, 3000.f);
-	cam.setPosition(glm::vec3(0, 0, 10));
+	cam.setPosition(glm::vec3(0, 0, 20));
 	cam.lookAt(glm::vec3(0.0, 0, 0.0));
-	cam.setVelocity(5);
+	cam.setVelocity(2);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
 }
 
@@ -86,7 +86,7 @@ void display()
 {
 	//glPolygonMode( GL_BACK, GL_LINE );
 	//clear screen
-	glClearColor(1.f, 1.f, 1.f, 1.0f);
+	glClearColor(.25f, .25f, .25f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClear(GL_ACCUM_BUFFER_BIT);
 
@@ -98,18 +98,47 @@ void display()
 	
 	
 	glm::mat4 m = cam.matrix()*trackBall->matrix()*model;
+	glm::mat4 normalMatrix = glm::transpose(cam.view() * trackBall->matrix() * model);
+
+	//Light source intensity
+	glm::vec3 ld = glm::vec3(1, 1, 1);
+	//diffuse reflectivity
+	glm::vec3 kd = glm::vec3(1.0,1.0,1);
 	
 	//Pass uniforms to shader
-	if(shader->matrixUniform() != -1)
-		glUniformMatrix4fv(shader->matrixUniform(), 1, false, glm::value_ptr(m));
-	if(shader->lightPos() != -1)
-		glUniform3fv(shader->lightPos(), 1, glm::value_ptr(cam.position()));
+	//Projection Matrix
+	if(shader->proj_loc != -1)
+		glUniformMatrix4fv(shader->proj_loc, 1, false, glm::value_ptr(cam.projection()));
+
+	//Model View Matrix
+	if(shader->mv_loc != -1)
+		glUniformMatrix4fv(shader->mv_loc, 1, false, glm::value_ptr(cam.view()*model));
+
+	//MVP Matrix
+	if(shader->mvp_loc != -1)
+		glUniformMatrix4fv(shader->mvp_loc, 1, false, glm::value_ptr(m));
+
+	//Normal Matrix
+	if(shader->normat_loc != -1)
+		glUniformMatrix4fv(shader->normat_loc, 1, false, glm::value_ptr(normalMatrix));
+
+	//light position
+	glm::vec4 lp = cam.view() * trackBall->matrix() * model * glm::vec4(0,50, 0, 1);
+	//glm::vec4 lp = glm::vec4(0,50, 0, 1);
+	if(shader->lightPos_loc != -1)
+		glUniform3fv(shader->lightPos_loc, 1, glm::value_ptr(lp));
+
+	if(shader->kdloc != -1)
+		glUniform3fv(shader->kdloc, 1, glm::value_ptr(kd));
+	
+	if(shader->ldloc != -1)
+		glUniform3fv(shader->ldloc, 1, glm::value_ptr(ld));
 
 	shader->enableShaderAttribs();
 	glPointSize(2.0);
 	//terrain->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib());
 	//plane->render(shader->positionAttrib(), shader->colorAttrib(), shader->normalAttrib(), shader->texcoordAttrib(), shader->sampleUniform());
-	mesh->Render(shader->positionAttrib(), shader->texcoordAttrib(),shader->normalAttrib(), shader->sampleUniform());
+	mesh->Render(shader->pos_loc, shader->texcoord_loc,shader->normal_loc, shader->sample_loc);
 
 	glUseProgram(0);
 
