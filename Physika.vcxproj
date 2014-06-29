@@ -86,10 +86,12 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="cube.cpp" />
+    <ClCompile Include="GLSLShader.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="image.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="NewGrid.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
@@ -98,6 +100,7 @@
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="trackball.cpp" />
+    <ClCompile Include="VertexBufferObject.cpp" />
     <ClCompile Include="voxelgrid.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -111,9 +114,11 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="cube.h" />
+    <ClInclude Include="GLSLShader.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="NewGrid.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
@@ -123,6 +128,7 @@
     <ClInclude Include="texture.h" />
     <ClInclude Include="trackball.h" />
     <ClInclude Include="util.h" />
+    <ClInclude Include="VertexBufferObject.h" />
     <ClInclude Include="voxelgrid.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
