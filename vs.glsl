@@ -1,10 +1,10 @@
 #version 330
 
 //In variables
-layout (location=0) in vec3 VertexPosition; 
-layout (location=1) in vec3 VertexNormal;
-layout (location=2) in vec2 VertexTexture; 
-layout (location=3) in vec3 VertexColor;
+in vec3 VertexPosition; 
+in vec3 VertexNormal;
+in vec2 VertexTexture; 
+in vec3 VertexColor;
 
 
 //Out Variables

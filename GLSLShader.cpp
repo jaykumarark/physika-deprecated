@@ -4,6 +4,7 @@
 GLSLShader::GLSLShader(const char* vsource, const char* fsource)
 {
 	m_Program = glCreateProgram();
+	
 	addVertexShader(vsource);
 	addFragmentShader(fsource);
 	bindAttributeLocations();
@@ -25,6 +26,16 @@ void GLSLShader::bindAttributeLocations()
 	glBindAttribLocation(m_Program, VERTEX_NORMAL, "VertexNormal");
 	glBindAttribLocation(m_Program, VERTEX_TEXTURE, "VertexTexture");
 	glBindAttribLocation(m_Program, VERTEX_COLOR, "VertexColor");
+}
+
+void GLSLShader::use()
+{
+	glUseProgram(m_Program);
+}
+
+void GLSLShader::disuse()
+{
+	glUseProgram(0);
 }
 
 GLint GLSLShader::getUniformLocation(const GLchar *varname)
@@ -71,7 +82,7 @@ void GLSLShader::addVertexShader(const char *vfile)
 	if(vstr.size() != 0){
 		m_vs = createShader(GL_VERTEX_SHADER,file_read(vfile));
 		glAttachShader(m_Program, m_vs);
-		std::cout<<"Vertex Shader Added";
+		std::cout<<"Vertex Shader \""<< vstr<<"\" Added"<<std::endl;
 	}
 	else{
 		std::cerr<<"No Vertex Shader Detected";
@@ -84,7 +95,7 @@ void GLSLShader::addFragmentShader(const char *ffile)
 	if(fstr.size() != 0){
 		m_fs = createShader(GL_FRAGMENT_SHADER,file_read(ffile));
 		glAttachShader(m_Program, m_fs);
-		std::cout<<"Fragment Shader Added";
+		std::cout<<"Fragment Shader \""<<fstr<<"\" Added"<<std::endl;
 	}
 	else{
 		std::cerr<<"No Fragment Shader Detected";
