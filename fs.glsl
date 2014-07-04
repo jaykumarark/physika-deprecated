@@ -11,27 +11,13 @@ uniform sampler2D gtexture;
 
 void main()
 {		
-		vec3 v = normalize(view);	
-		vec3 n = normalize(normal0);	//normal of the surface for each vertex
-		vec3 s = normalize(light);  //direction light source. 
-		vec3 r = reflect(-s, n);
-		
-		//ambient
-		vec3 la = vec3(0.3, 0.3, 0.3);
-		vec3 ka = vec3(0.3, 0.3, 0.3);
-		vec3 ambient = la*ka;
+	const float scale = 15.0;
+	bvec2 toDiscard = greaterThan(fract(texcoord0*scale), vec2(0.1, 0.1));
 
-		//diffuse
-		vec3 ld = vec3(.5, 0.5, 0.5); // color of light with intensity for each component
-		float kd = vec3(0.8, 0.2, 0.5); //diffuse reflectivity
-		vec3 diffuseTerm = ld * kd * max(dot(s, n), 0.0);
-
-		//specular
-		vec3 ls = vec3(1,1,1);
-		vec3 ks = vec3(.9, 0.9, 0.9);
-		vec3 spec = ls * ks * pow(max(dot(r, v), 0.0), 50);
+	if(all(toDiscard))
+		discard;
 
 
-		//outputColor = color0 * diffuse;
-		outputColor = vec4(diffuseTerm+ambient+spec, 1.0);
+	outputColor = color0;
+	//outputColor = vec4(1, 0, 0, 1);
 }

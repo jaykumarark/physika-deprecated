@@ -26,7 +26,7 @@ public:
 		}
 	};
 
-	ModelLoader(void);
+	ModelLoader(const std::string filename);
 	~ModelLoader(void);
 	bool LoadMesh(const std::string filename);
 	std::vector<Vertex> data();
@@ -34,21 +34,7 @@ public:
 
 private: 
 	void InitFromScene(const aiScene* pScene, const std::string& filename);
-	void InitMesh(unsigned Index, const aiMesh* paiMesh);
-	void Clear();
-
-	struct MeshEntry
-	{
-		MeshEntry();
-		~MeshEntry();
-
-		void Init(const std::vector<Vertex>& Vertices, const std::vector<unsigned int>& Indices); 
-
-		unsigned int NumIndices; 
-		unsigned int MaterialIndex;
-	};
-
-	std::vector<MeshEntry> m_Entries;
+	void InitMesh(const aiMesh* paiMesh);
 	std::vector<Vertex> m_data; 
 	std::vector<unsigned int> m_indices;
 	bool m_hasTextures;

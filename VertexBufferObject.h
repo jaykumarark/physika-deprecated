@@ -4,9 +4,10 @@
 #include "ModelLoader.h"
 #include <vector>
 
-#define VERTEX_POSITION 0
-#define VERTEX_NORMAL 1
-#define VERTEX_TEXTURE 2
+#define VERTEX_POSITION		0
+#define VERTEX_NORMAL		1
+#define VERTEX_TEXTURE		2
+#define VERTEX_COLOR		3
 
 
 class VertexBufferObject

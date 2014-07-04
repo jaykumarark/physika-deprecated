@@ -123,7 +123,7 @@ void display()
 		glUniformMatrix4fv(shader->normat_loc, 1, false, glm::value_ptr(normalMatrix));
 
 	//light position
-	glm::vec4 lp = cam.view() * trackBall->matrix() * model * glm::vec4(0,50, 0, 1);
+	glm::vec4 lp = cam.view() * model * glm::vec4(0,50, 0, 1);
 	//glm::vec4 lp = glm::vec4(0,50, 0, 1);
 	if(shader->lightPos_loc != -1)
 		glUniform3fv(shader->lightPos_loc, 1, glm::value_ptr(lp));

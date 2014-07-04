@@ -1,8 +1,9 @@
 #include "ModelLoader.h"
 
 
-ModelLoader::ModelLoader(void)
+ModelLoader::ModelLoader(const std::string filename)
 {
+	LoadMesh(filename);
 }
 
 
@@ -32,19 +33,15 @@ bool ModelLoader::LoadMesh(const std::string filename)
 
 void ModelLoader::InitFromScene(const aiScene* pScene, const std::string& Filename)
 {
-	m_Entries.resize(pScene->mNumMeshes);
 
 	//init meshes in scene
-	for(unsigned int i = 0; i < m_Entries.size() ; i++)
-	{
-		const aiMesh* paiMesh = pScene->mMeshes[i];
-		InitMesh(i, paiMesh);
-	}
+	const aiMesh* paiMesh = pScene->mMeshes[0];
+	InitMesh(paiMesh);
+	
 }
 
-void ModelLoader::InitMesh(unsigned int Index, const aiMesh* paiMesh)
+void ModelLoader::InitMesh(const aiMesh* paiMesh)
 {
-	m_Entries[Index].MaterialIndex = paiMesh->mMaterialIndex;
 	const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
 	for(unsigned int i = 0; i < paiMesh->mNumVertices;i++)
@@ -67,4 +64,14 @@ void ModelLoader::InitMesh(unsigned int Index, const aiMesh* paiMesh)
 		m_indices.push_back(Face.mIndices[1]);
 		m_indices.push_back(Face.mIndices[2]);
 	}
+}
+
+std::vector<ModelLoader::Vertex> ModelLoader::data()
+{
+	return m_data;
+}
+
+std::vector<unsigned int> ModelLoader::indices()
+{
+	return m_indices;
 }
