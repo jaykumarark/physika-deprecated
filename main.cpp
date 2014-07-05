@@ -12,6 +12,7 @@
 #include "cube.h"
 #include "PlaneGrid.h"
 #include "PObject.h"
+#include "ObjectSlab.h"
 #include <time.h>
 
 int gwidth = 1024;
@@ -20,6 +21,7 @@ int gheight = 768;
 Camera cam;
 TrackBall* trackBall;
 PlaneGrid* plane; 
+ObjectSlab* triangle; 
 PObject* teapot;
  
 //Keyboard variables
@@ -32,7 +34,7 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(0.1f, 3000.f);
-	cam.setPosition(glm::vec3(0, 0, 20));
+	cam.setPosition(glm::vec3(20, 20, 20));
 	cam.lookAt(glm::vec3(0.0, 0, 0.0));
 	cam.setVelocity(2);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
@@ -43,8 +45,9 @@ void initOpengl()
 	glEnable(GL_DEPTH_TEST);
 	initCamera();
 	trackBall = new TrackBall(gwidth, gheight);
-	plane = new PlaneGrid(glm::vec3(0,0,0), 512, 512);	
+	plane = new PlaneGrid(glm::vec3(0,0,0), 64, 64);	
 	teapot = new PObject("models/teapot.obj");
+	triangle = new ObjectSlab("models/bunny.obj");
 }
 
 
@@ -53,7 +56,9 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	teapot->render(cam, trackBall);
+	//teapot->render(cam, trackBall); 
+	plane->render(cam, trackBall);
+	triangle->render(cam, trackBall);
 	glutPostRedisplay();
 	glutSwapBuffers();
 }

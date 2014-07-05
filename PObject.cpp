@@ -36,6 +36,7 @@ void PObject::render(Camera cam, TrackBall* tb)
 
 	//Light Position
 	glm::vec4 lp = cam.view() * m_model * glm::vec4(0,50,0,1);
+//	glm::vec4 lp = glm::vec4(0,50,0,1);
 	m_shader->setUniform("lightPosition", lp);
 	//Material 
 	glm::vec3 kd = glm::vec3(1.f, 1.f, 1.f);
@@ -44,7 +45,6 @@ void PObject::render(Camera cam, TrackBall* tb)
 	glm::vec3 ld = glm::vec3(1.f, 1.f, 1.f);
 	m_shader->setUniform("ld", ld);
 
-	glPointSize(3.0f);
 	m_vbo->render();
 
 	m_shader->disuse();

@@ -60,7 +60,6 @@ void Grid::initGrid()
 		}
 	}
 
-	std::vector<glm::vec3> unnormalized;
 
 	//initialize m_normals
 	for(int i = 0 ; i < m_vertices.size();i++)
@@ -68,6 +67,8 @@ void Grid::initGrid()
 		m_normals.push_back(glm::vec3(0,0,0));
 	}
 
+	//This works for row wise grids 
+	//Make sure the grid is row wise else the normals are going to be incorrect. 
 	for(int i = 0; i < m_indices.size();i+=3)
 	{
 		unsigned int idx1 = m_indices[i];

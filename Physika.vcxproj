@@ -93,6 +93,8 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="NewGrid.cpp" />
+    <ClCompile Include="ObjectSlab.cpp" />
+    <ClCompile Include="PickingRay.cpp" />
     <ClCompile Include="PlaneGrid.cpp" />
     <ClCompile Include="PObject.cpp" />
     <ClCompile Include="texture.cpp" />
@@ -117,6 +119,8 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="NewGrid.h" />
+    <ClInclude Include="ObjectSlab.h" />
+    <ClInclude Include="PickingRay.h" />
     <ClInclude Include="PlaneGrid.h" />
     <ClInclude Include="PObject.h" />
     <ClInclude Include="texture.h" />

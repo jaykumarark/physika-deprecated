@@ -12,6 +12,7 @@
 
 class VertexBufferObject
 {
+
 public:
 	VertexBufferObject(GLenum m_target, GLenum m_primitiveMode);
 	void init(const std::vector<ModelLoader::Vertex> verts, const std::vector<unsigned int> indices);
