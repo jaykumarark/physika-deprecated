@@ -13,6 +13,7 @@
 #include "PlaneGrid.h"
 #include "PObject.h"
 #include "ObjectSlab.h"
+#include "PickingRay.h"
 #include <time.h>
 
 int gwidth = 1024;
@@ -23,6 +24,7 @@ TrackBall* trackBall;
 PlaneGrid* plane; 
 ObjectSlab* triangle; 
 PObject* teapot;
+PickingRay* pr; 
  
 //Keyboard variables
 bool keyStates[256];
@@ -34,8 +36,8 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(0.1f, 3000.f);
-	cam.setPosition(glm::vec3(20, 20, 20));
-	cam.lookAt(glm::vec3(0.0, 0, 0.0));
+	cam.setPosition(glm::vec3(0, 20, 20));
+	cam.lookAt(glm::vec3(0.0, 20, 0.0));
 	cam.setVelocity(2);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
 }
@@ -44,10 +46,11 @@ void initOpengl()
 {
 	glEnable(GL_DEPTH_TEST);
 	initCamera();
-	trackBall = new TrackBall(gwidth, gheight);
-	plane = new PlaneGrid(glm::vec3(0,0,0), 64, 64);	
-	teapot = new PObject("models/teapot.obj");
-	triangle = new ObjectSlab("models/bunny.obj");
+	trackBall			= new TrackBall(gwidth, gheight);
+	plane				= new PlaneGrid(glm::vec3(0,0,0), 64, 64);	
+	teapot				= new PObject("models/teapot.obj");
+	triangle			= new ObjectSlab("models/bunny.obj");
+	pr					= new PickingRay(gwidth, gheight);
 }
 
 
@@ -59,6 +62,7 @@ void display()
 	//teapot->render(cam, trackBall); 
 	plane->render(cam, trackBall);
 	triangle->render(cam, trackBall);
+	pr->render(cam);
 	glutPostRedisplay();
 	glutSwapBuffers();
 }
@@ -93,6 +97,8 @@ void mwheel(int wheel, int direction, int x, int y)
 
 void mouse(int button, int state, int x, int y)
 {
+	
+	pr->getRay(x, y, cam);
 	if(state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)
 	{
 		trackBall->mouseDown(x, y);
@@ -137,12 +143,12 @@ void processKeyboard(float dt)
 
 	if(keyStates['s'] || keyStates['S'])
 	{
-		cam.offsetPosition(cam.velocity()*dt*-cam.forward());
+		cam.offsetPosition(cam.velocity()*dt*-cam.up());
 	}
 
 	if(keyStates['w'] || keyStates['W'])
 	{
-		cam.offsetPosition(cam.velocity()*dt*cam.forward());
+		cam.offsetPosition(cam.velocity()*dt*cam.up());
 	}
 
 	if(keyStates['d'] || keyStates['D'])
