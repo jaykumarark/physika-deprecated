@@ -17,6 +17,7 @@ private:
 	void normalizeAngles();
 	int mWindowWidth;
 	int mWindowHeight;
+	glm::vec3 m_target;
 	
 
 public:
@@ -39,12 +40,13 @@ public:
 	glm::mat4 view(); 
 	glm::mat4 projection();
 	glm::mat4 matrix();
-	glm::vec3 up();
-	glm::vec3 right();
-	glm::vec3 forward();
+	const glm::vec3 up();
+	const glm::vec3 right();
+	const glm::vec3 forward();
 	void setAspRatio(float aspRat);
 	float viewportAspRat();
 	void lookAt(glm::vec3 position);
+	const glm::vec3 target();
 	void offsetOrientation(float upAngle, float rightAngle);
 	glm::mat4 orientation(); 
 	void setNearFar(float near, float far);

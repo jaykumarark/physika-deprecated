@@ -86,11 +86,17 @@ Camera::Camera(void):
 
 	void Camera::lookAt(glm::vec3 position)
 	{
+		m_target = position;
 		assert(position != mpos); 
 		glm::vec3 direction = glm::normalize(position - mpos);
 		mvAngle = RadiansToDegrees(asinf(-direction.y));
 		mhAngle = -RadiansToDegrees(atan2f(-direction.x, -direction.z));
 		normalizeAngles();
+	}
+
+	const glm::vec3 Camera::target()
+	{
+		return m_target;
 	}
 
 	float Camera::viewportAspRat(){
@@ -102,19 +108,19 @@ Camera::Camera(void):
 		mAsp = viewAspectRatio;
 	}
 
-	glm::vec3 Camera::forward()
+	const glm::vec3 Camera::forward()
 	{
 		glm::vec4 forward = glm::inverse(orientation()) * glm::vec4(0,0,-1,1);
 		return glm::vec3(forward);
 	}
 
-	glm::vec3 Camera::right() 
+	const glm::vec3 Camera::right() 
 	{
 		glm::vec4 right = glm::inverse(orientation())*glm::vec4(1,0,0,1); 
 		return glm::vec3(right);
 	}
 
-	glm::vec3 Camera::up()
+	const glm::vec3 Camera::up()
 	{
 		glm::vec4 up = glm::inverse(orientation()) * glm::vec4(0,1,0,1);
 		return glm::vec3(up);

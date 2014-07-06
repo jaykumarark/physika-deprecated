@@ -24,7 +24,6 @@ TrackBall* trackBall;
 PlaneGrid* plane; 
 ObjectSlab* triangle; 
 PObject* teapot;
-PickingRay* pr; 
  
 //Keyboard variables
 bool keyStates[256];
@@ -35,9 +34,9 @@ void initCamera(){
 	cam.init();
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
-	cam.setNearFar(0.1f, 3000.f);
-	cam.setPosition(glm::vec3(0, 20, 20));
-	cam.lookAt(glm::vec3(0.0, 20, 0.0));
+	cam.setNearFar(1.f, 3000.f);
+	cam.setPosition(glm::vec3(0, 10, 20));
+	cam.lookAt(glm::vec3(0.0, 0, 0.0));
 	cam.setVelocity(2);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
 }
@@ -49,8 +48,7 @@ void initOpengl()
 	trackBall			= new TrackBall(gwidth, gheight);
 	plane				= new PlaneGrid(glm::vec3(0,0,0), 64, 64);	
 	teapot				= new PObject("models/teapot.obj");
-	triangle			= new ObjectSlab("models/bunny.obj");
-	pr					= new PickingRay(gwidth, gheight);
+	triangle			= new ObjectSlab("models/box.obj");
 }
 
 
@@ -60,9 +58,8 @@ void display()
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//teapot->render(cam, trackBall); 
-	plane->render(cam, trackBall);
+	//plane->render(cam, trackBall);
 	triangle->render(cam, trackBall);
-	pr->render(cam);
 	glutPostRedisplay();
 	glutSwapBuffers();
 }
@@ -97,8 +94,11 @@ void mwheel(int wheel, int direction, int x, int y)
 
 void mouse(int button, int state, int x, int y)
 {
-	
-	pr->getRay(x, y, cam);
+	if(state == GLUT_DOWN && button == GLUT_MIDDLE_BUTTON)
+	{
+		triangle->select(x, y, cam);
+	}
+
 	if(state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)
 	{
 		trackBall->mouseDown(x, y);
@@ -143,12 +143,12 @@ void processKeyboard(float dt)
 
 	if(keyStates['s'] || keyStates['S'])
 	{
-		cam.offsetPosition(cam.velocity()*dt*-cam.up());
+		cam.offsetPosition(cam.velocity()*dt*-cam.forward());
 	}
 
 	if(keyStates['w'] || keyStates['W'])
 	{
-		cam.offsetPosition(cam.velocity()*dt*cam.up());
+		cam.offsetPosition(cam.velocity()*dt*cam.forward());
 	}
 
 	if(keyStates['d'] || keyStates['D'])

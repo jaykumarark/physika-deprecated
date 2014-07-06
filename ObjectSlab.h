@@ -11,6 +11,7 @@
 #include <gl\glew.h>
 #include "Camera.h"
 #include "trackball.h"
+#include "PickingRay.h"
 
 
 struct Face
@@ -39,6 +40,7 @@ public:
 	void createEdges();
 	void connectTwinEdges();
 	void render(Camera cam, TrackBall* tb);
+	void select(float mx, float my, Camera cam);
 	~ObjectSlab(void);
 
 private:

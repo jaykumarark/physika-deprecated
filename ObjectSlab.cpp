@@ -5,13 +5,31 @@ using namespace glm;
 
 ObjectSlab::ObjectSlab(std::string filename)
 {
-	m_model = glm::scale(glm::mat4(1.f), glm::vec3(100, 100, 100));
+	m_model = glm::translate(glm::mat4(1), glm::vec3(0, 1, 0));
+	m_model = glm::scale(m_model, glm::vec3(1, 1, 1));
+
+	m_model = glm::mat4(1);
+
 	importStream(filename);
 	//createEdges();
 	//connectTwinEdges();
 }
 ObjectSlab::~ObjectSlab(void)
 {
+}
+
+void ObjectSlab::select(float mx, float my, Camera cam)
+{
+	for(int i = 0; i < m_faces.size(); i++)
+	{
+		glm::vec3 p0 = m_vertices[m_faces[i].vi[0]];
+		glm::vec3 p1 = m_vertices[m_faces[i].vi[1]];
+		glm::vec3 p2 = m_vertices[m_faces[i].vi[2]];
+
+		PickingRay pr(1024, 768);
+
+		m_faceBool[i] = pr.intersect(p0, p1, p2, mx, my, cam);
+	}
 }
 
 void ObjectSlab::render(Camera cam, TrackBall* tb)
@@ -33,6 +51,8 @@ void ObjectSlab::render(Camera cam, TrackBall* tb)
 		float z = m_vertices[m_faces[i].vi[0]].z;
 
 		glColor3f(0.f, 0.6f, 1.f);
+		if(m_faceBool[i])
+			glColor3f(1.f, 0.3f, 0.f);
 
 		glVertex3f(x, y, z);
 
@@ -144,6 +164,7 @@ void ObjectSlab::importStream(std::string filename)
 
 			}
 			m_faces.push_back(face);
+			m_faceBool.push_back(false);
 		}
 		//Vertices
 		if((line[0]=='v')&& (line[1] == ' '))
