@@ -12,7 +12,8 @@ class PickingRay
 public:
 	PickingRay(int width, int height);
 	void getRay(float mx, float my, Camera cam);
-	bool intersect(glm::vec3, glm::vec3, glm::vec3, float mx, float my, Camera cam);
+	bool intersect(glm::vec3, glm::vec3, glm::vec3, float mx, float my, Camera cam, glm::mat4 m);
+	void render(Camera cam);
 	glm::vec3 PickingRay::rayDir();
 	glm::vec3 PickingRay::rayPos();
 	~PickingRay(void);

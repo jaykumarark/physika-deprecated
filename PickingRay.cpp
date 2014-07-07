@@ -11,6 +11,38 @@ PickingRay::~PickingRay(void)
 {
 }
 
+void PickingRay::render(Camera cam)
+{
+	glColor3f(0.f, 1.f, 0.f);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(glm::value_ptr(cam.projection()));
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(glm::value_ptr(cam.view()));
+
+	glBegin(GL_LINES);
+
+	glVertex3f(m_clickpos.x, m_clickpos.y, m_clickpos.z);
+	glVertex3f(m_clickEnd.x, m_clickEnd.y, m_clickEnd.z);
+	
+	glEnd();
+
+	glPointSize(10.f);
+	glBegin(GL_POINTS);
+	glColor3f(1.f, 1.f, 1.f);
+	glVertex3f(m_clickpos.x, m_clickpos.y, m_clickpos.z);
+	glColor3f(1.f, 0.f, 0.f);
+	glVertex3f(m_clickEnd.x, m_clickEnd.y, m_clickEnd.z);
+	glEnd();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
 //source: http://schabby.de/picking-opengl-ray-tracing/
 void PickingRay::getRay(float mx, float my, Camera cam)
 {
@@ -33,6 +65,9 @@ void PickingRay::getRay(float mx, float my, Camera cam)
 	glm::vec3 pos = cam.position() + (view * cam.nearPlane()) + (h*m.x) + (v*m.y);
 	glm::vec3 dir = glm::normalize(pos - cam.position());
 
+	m_clickpos = pos;
+	m_clickEnd = cam.target();
+
 	m_rayPos = pos; 
 	m_rayDir = dir;
 }
@@ -45,47 +80,18 @@ void PickingRay::print(glm::vec3 p)
 
 
 //Ray-Triangle Intersection 
-//source: http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-9-ray-triangle-intersection/ray-triangle-intersection-geometric-solution/
-bool PickingRay::intersect(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float mx, float my, Camera cam)
+//source: http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-9-ray-triangle-intersection/m-ller-trumbore-algorithm/
+bool PickingRay::intersect(glm::vec3 v0f, glm::vec3 v1f, glm::vec3 v2f, float mx, float my, Camera cam, glm::mat4 m)
 {
+	glm::vec4 temp0 = m * glm::vec4(v0f.x, v0f.y, v0f.z, 1);
+	glm::vec4 temp1 = m * glm::vec4(v1f.x, v1f.y, v1f.z, 1);
+	glm::vec4 temp2 = m * glm::vec4(v2f.x, v2f.y, v2f.z, 1);
+
+	glm::vec3 v0 = glm::vec3(temp0.x, temp0.y, temp0.z);
+	glm::vec3 v1 = glm::vec3(temp1.x, temp1.y, temp1.z);
+	glm::vec3 v2 = glm::vec3(temp2.x, temp2.y, temp2.z);
+
 	getRay(mx, my, cam);
-	//glm::vec3 e1 = p1 - p0; 
-	//glm::vec3 e2 = p2 - p0; 
-
-	//glm::vec3 N = glm::cross(e1, e2);
-
-	//float nDotRayDir = glm::dot(N, m_rayDir);
-	////if parallel or not
-	//if(nDotRayDir == 0)
-	//	return false; //parallel
-
-	////compute d
-	//float d = glm::dot(N, p0);
-	////compute t
-	//float t = -(glm::dot(N, m_rayPos)+d);
-
-	//if(t < 0)
-	//	return false; 
-	////intersection point 
-	//glm::vec3 P = m_rayPos + t * m_rayDir;
-
-	//glm::vec3 e0 = p0-p1;
-	//e1 = p1-p2;
-	//e2 = p2-p0;
-
-	//glm::vec3 c0 = P - p0;
-	//glm::vec3 c1 = P - p1;
-	//glm::vec3 c2 = P - p2;
-
-	//if (!(glm::dot(N, glm::cross(e0, c0)) > 0 && 
-	//	glm::dot(N, glm::cross(e1, c1)) > 0 &&
-	//	glm::dot(N, glm::cross(e2, c2)) > 0))
-	//	{return false;}
-
-
-	//return true;
-
-
 	//soren
 
 	float eps = 0.000000001f;
@@ -114,8 +120,7 @@ bool PickingRay::intersect(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, float mx, f
 	if(v < 0.0f || u+v > 1.0f)
 		return false;
 
-	float t = (std::numeric_limits<float>::max)();
-	t = f * glm::dot(e2, q);
+	float t = f * glm::dot(e2, q);
 
 	return true;
 }

@@ -6,13 +6,14 @@ using namespace glm;
 ObjectSlab::ObjectSlab(std::string filename)
 {
 	m_model = glm::translate(glm::mat4(1), glm::vec3(0, 1, 0));
-	m_model = glm::scale(m_model, glm::vec3(1, 1, 1));
-
-	m_model = glm::mat4(1);
+	m_model = glm::scale(m_model, glm::vec3(5, 5, 5));
+	
+	m_ray = new PickingRay(1024, 768);
+	//m_model = glm::mat4(1);
 
 	importStream(filename);
-	//createEdges();
-	//connectTwinEdges();
+	createEdges();
+	connectTwinEdges();
 }
 ObjectSlab::~ObjectSlab(void)
 {
@@ -20,21 +21,22 @@ ObjectSlab::~ObjectSlab(void)
 
 void ObjectSlab::select(float mx, float my, Camera cam)
 {
-	for(int i = 0; i < m_faces.size(); i++)
+	for(int i = 6; i < 7; i++)
 	{
 		glm::vec3 p0 = m_vertices[m_faces[i].vi[0]];
 		glm::vec3 p1 = m_vertices[m_faces[i].vi[1]];
 		glm::vec3 p2 = m_vertices[m_faces[i].vi[2]];
 
-		PickingRay pr(1024, 768);
 
-		m_faceBool[i] = pr.intersect(p0, p1, p2, mx, my, cam);
+		m_faceBool[i] = m_ray->intersect(p0, p1, p2, mx, my, cam, m_model);
 	}
 }
 
 void ObjectSlab::render(Camera cam, TrackBall* tb)
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	m_ray->render(cam);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(glm::value_ptr(cam.projection()));
 
@@ -43,6 +45,7 @@ void ObjectSlab::render(Camera cam, TrackBall* tb)
 
 	glBegin(GL_TRIANGLES);
 
+	//m_faceBool[6] = true;
 
 	for(int i = 0 ; i < m_faces.size() ; i++ )
 	{

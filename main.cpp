@@ -35,8 +35,8 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(1.f, 3000.f);
-	cam.setPosition(glm::vec3(0, 10, 20));
-	cam.lookAt(glm::vec3(0.0, 0, 0.0));
+	cam.setPosition(glm::vec3(10, 10, 20));
+	cam.lookAt(glm::vec3(-5, 0, 0.0));
 	cam.setVelocity(2);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
 }
@@ -184,7 +184,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv); 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ACCUM);
 	glutInitWindowSize(gwidth,gheight);
-	glutInitWindowPosition(100, 200);
+	glutInitWindowPosition(100, 30);
 	glutCreateWindow("Physika - Terrain Generator");
 	createGlutCallBacks();
 	GLenum res = glewInit();

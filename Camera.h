@@ -53,6 +53,9 @@ public:
 	void setVelocity(float speed);
 	float velocity();
 
+	const float vAngle();
+	const float hAngle();
+
 	void setWindowCoords(int w, int h);
 	void setMouseCoords(int x, int y);
 	void Camera::onMouseMove(int x, int y);

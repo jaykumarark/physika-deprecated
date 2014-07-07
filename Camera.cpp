@@ -80,8 +80,8 @@ Camera::Camera(void):
 	void Camera::offsetOrientation(float upAngle, float rightAngle)
 	{
 		mhAngle += rightAngle; 
-		mvAngle += upAngle; 
-		normalizeAngles();
+		mvAngle += upAngle;
+		normalizeAngles();		
 	}
 
 	void Camera::lookAt(glm::vec3 position)
@@ -94,8 +94,20 @@ Camera::Camera(void):
 		normalizeAngles();
 	}
 
+	const float Camera::vAngle()
+	{
+		return mvAngle;
+	}
+
+	const float Camera::hAngle()
+	{
+		return mhAngle;
+	}
+
 	const glm::vec3 Camera::target()
 	{
+			//compute the new direction of the look at vector.
+		m_target = mpos + forward();
 		return m_target;
 	}
 

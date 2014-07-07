@@ -51,5 +51,6 @@ private:
 	std::vector<glm::vec3> m_normals; 
 	std::vector<glm::vec3> m_texcoord; 
 	glm::mat4 m_model;
+	PickingRay* m_ray;
 };
 
