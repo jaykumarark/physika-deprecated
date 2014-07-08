@@ -39,18 +39,23 @@ public:
 	void importStream(std::string filename);
 	void createEdges();
 	void connectTwinEdges();
+	void subdivide(int idx);
 	void render(Camera cam, TrackBall* tb);
 	void select(float mx, float my, Camera cam);
+	bool isSkinny(Edge e, glm::vec3 o);
+	void flipEdge(int ei, int vi);		//flip an edge given a barycentric coordinate and an edge index
 	~ObjectSlab(void);
 
 private:
 	std::vector<Face> m_faces; 
 	std::vector<bool> m_faceBool;	// if set to false, that face is rejected while rendering. 
+	std::vector<bool> m_isSelect; //	is selected by mouse click
 	std::vector<Edge> m_edges; 
 	std::vector<glm::vec3> m_vertices; 
 	std::vector<glm::vec3> m_normals; 
 	std::vector<glm::vec3> m_texcoord; 
 	glm::mat4 m_model;
 	PickingRay* m_ray;
+	unsigned int m_subindex;			//Temporary. Can be removed later. 
 };
 

@@ -107,7 +107,7 @@ Camera::Camera(void):
 	const glm::vec3 Camera::target()
 	{
 			//compute the new direction of the look at vector.
-		m_target = mpos + forward();
+		//m_target = mpos + 10.f * forward();
 		return m_target;
 	}
 

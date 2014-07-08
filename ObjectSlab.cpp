@@ -9,7 +9,8 @@ ObjectSlab::ObjectSlab(std::string filename)
 	m_model = glm::scale(m_model, glm::vec3(5, 5, 5));
 	
 	m_ray = new PickingRay(1024, 768);
-	//m_model = glm::mat4(1);
+	
+	m_subindex = 0;
 
 	importStream(filename);
 	createEdges();
@@ -26,17 +27,27 @@ void ObjectSlab::select(float mx, float my, Camera cam)
 		glm::vec3 p0 = m_vertices[m_faces[i].vi[0]];
 		glm::vec3 p1 = m_vertices[m_faces[i].vi[1]];
 		glm::vec3 p2 = m_vertices[m_faces[i].vi[2]];
-
-
-		m_faceBool[i] = m_ray->intersect(p0, p1, p2, mx, my, cam, m_model);
+		m_isSelect[i] = m_ray->intersect(p0, p1, p2, mx, my, cam, m_model);
 	}
+
+	if(m_subindex < m_faces.size())
+	{
+		subdivide(m_subindex);
+		m_subindex++;
+	}
+
+	//subdivide(6);
+	
+	
+
+	
 }
 
 void ObjectSlab::render(Camera cam, TrackBall* tb)
 {
 
 	m_ray->render(cam);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT, GL_FILL);
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(glm::value_ptr(cam.projection()));
 
@@ -45,31 +56,39 @@ void ObjectSlab::render(Camera cam, TrackBall* tb)
 
 	glBegin(GL_TRIANGLES);
 
-	//m_faceBool[6] = true;
 
 	for(int i = 0 ; i < m_faces.size() ; i++ )
 	{
-		float x = m_vertices[m_faces[i].vi[0]].x;
-		float y = m_vertices[m_faces[i].vi[0]].y;
-		float z = m_vertices[m_faces[i].vi[0]].z;
-
-		glColor3f(0.f, 0.6f, 1.f);
 		if(m_faceBool[i])
+		{
+
+			if(!m_faceBool[i])
+			{glColor3f(1.f, 0.3f, 0.f);}
+			else
+			{glColor3f(0.f, 0.6f, 1.f);}
+
+
+			float x = m_vertices[m_faces[i].vi[0]].x;
+			float y = m_vertices[m_faces[i].vi[0]].y;
+			float z = m_vertices[m_faces[i].vi[0]].z;
+	
 			glColor3f(1.f, 0.3f, 0.f);
+			glVertex3f(x, y, z);
+	
+			x = m_vertices[m_faces[i].vi[1]].x;
+			y = m_vertices[m_faces[i].vi[1]].y;
+			z = m_vertices[m_faces[i].vi[1]].z;
 
-		glVertex3f(x, y, z);
+			glColor3f(0.f, 0.6f, 1.f);
+			glVertex3f(x, y, z);
+	
+			x = m_vertices[m_faces[i].vi[2]].x;
+			y = m_vertices[m_faces[i].vi[2]].y;
+			z = m_vertices[m_faces[i].vi[2]].z;
 
-		x = m_vertices[m_faces[i].vi[1]].x;
-		y = m_vertices[m_faces[i].vi[1]].y;
-		z = m_vertices[m_faces[i].vi[1]].z;
-
-		glVertex3f(x, y, z);
-
-		x = m_vertices[m_faces[i].vi[2]].x;
-		y = m_vertices[m_faces[i].vi[2]].y;
-		z = m_vertices[m_faces[i].vi[2]].z;
-
-		glVertex3f(x, y, z);
+			glColor3f(0.f, 1.f, .6f);
+			glVertex3f(x, y, z);
+		}
 	
 	}
 	glEnd();
@@ -167,7 +186,8 @@ void ObjectSlab::importStream(std::string filename)
 
 			}
 			m_faces.push_back(face);
-			m_faceBool.push_back(false);
+			m_faceBool.push_back(true);
+			m_isSelect.push_back(false);
 		}
 		//Vertices
 		if((line[0]=='v')&& (line[1] == ' '))
@@ -267,4 +287,98 @@ void ObjectSlab::connectTwinEdges()
 			}
 		}
 	}
+}
+
+void ObjectSlab::subdivide(int idx)
+{
+	Face f = m_faces[idx];
+	m_faceBool[idx] = false; 
+	
+	vec3 A = m_vertices[f.vi[0]];
+	vec3 B = m_vertices[f.vi[1]];
+	vec3 C = m_vertices[f.vi[2]];
+
+	vec3 O = (A+B+C) / 3.f;
+
+	vec3 AB = A - B; 
+	vec3 BC = B - C; 
+	vec3 CA = C - A;
+
+	vec3 nor = glm::cross(AB, BC);
+	nor = normalize(nor);
+	nor = nor * .2f; 
+
+	//O = nor + O;
+
+	//new vertex is pushed
+	m_vertices.push_back(O);
+
+	//index of new vertex is size - 1
+	int idxO = m_vertices.size() - 1;
+
+
+	flipEdge(f.ei[0], idxO);
+	flipEdge(f.ei[1], idxO);
+	flipEdge(f.ei[2], idxO);
+
+	
+	/*Face f1;
+	Face f2;
+	Face f3;
+
+
+	f1.vi[0] = f.vi[0];
+	f1.vi[1] = f.vi[1];
+	f1.vi[2] = idxO;
+
+	f2.vi[0] = idxO;
+	f2.vi[1] = f.vi[1];
+	f2.vi[2] = f.vi[2];
+
+	f3.vi[0] = f.vi[2];
+	f3.vi[1] = f.vi[0];
+	f3.vi[2] = idxO;
+
+	//m_faces.push_back(f1);
+	m_faces.push_back(f2);
+	m_faces.push_back(f3);
+
+	//m_faceBool.push_back(true);
+	m_faceBool.push_back(true);
+	m_faceBool.push_back(true);*/
+}
+
+bool ObjectSlab::isSkinny(Edge e, glm::vec3 o)
+{
+	return true; 
+}
+
+//flip edges clockwise
+void ObjectSlab::flipEdge(int ei, int vi)
+{
+	Edge e = m_edges[ei];
+	vec3 O = m_vertices[vi]; //barycenter computed previously
+
+	//face of e is already deleted before the flip edge call
+	//delete the e's twin's face ( or rather stop rendering it)
+	m_faceBool[m_edges[e.twin].face]  = false;
+
+	int oppo = m_edges[e.twin].opp;		//opposite vertex of the twin
+
+	Face f3; //new face
+	Face f4; //new face
+
+	f3.vi[0] = oppo; 
+	f3.vi[1] = e.head;
+	f3.vi[2] = vi;
+
+	f4.vi[0] = vi; 
+	f4.vi[1] = e.tail; 
+	f4.vi[2] = oppo;
+
+	m_faces.push_back(f3);
+	m_faces.push_back(f4);
+
+	m_faceBool.push_back(true); // f3
+	m_faceBool.push_back(true); // f4 
 }
