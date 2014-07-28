@@ -10,14 +10,22 @@
 #include "PlaneGrid.h"
 #include "Camera.h"
 #include "trackball.h"
+#include "Light.h"
 
+struct Material
+{
+	glm::vec3 Ka;
+	glm::vec3 Kd;
+	glm::vec3 Ks;
+};
 
 class PlaneGrid
 {
 public:
-	PlaneGrid(glm::vec3 p, float w, float h);
-	void render(Camera cam, TrackBall* tb);
+	PlaneGrid(glm::vec3 p, float w, float h, glm::vec3 a, glm::vec3 d, glm::vec3 s);
 	~PlaneGrid(void);
+	void render(Camera cam, TrackBall* tb, Light* light);
+	void setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s);
 	
 
 private:
@@ -29,5 +37,6 @@ private:
 	Texture* mTex;
 	GLSLShader* m_shader; 
 	VertexBufferObject* m_vbo;
+	Material m_material;
 };
 

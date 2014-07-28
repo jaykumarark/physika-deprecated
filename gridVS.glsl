@@ -19,8 +19,15 @@ uniform mat4 NormalMatrix;
 uniform mat4 mvp;
 
 uniform vec4 lightPosition;
+
+uniform vec3 ka; 
+uniform vec3 la; 
+
 uniform vec3 kd; 
 uniform vec3 ld; 
+
+uniform vec3 ks; 
+uniform vec3 ls; 
 
 void main()
 {
@@ -29,14 +36,8 @@ void main()
 	vec3 s = normalize( vec3(lightPosition - eyeCoords));
 	vec3 r = reflect(-s, tnorm);
 	vec3 v = normalize(-eyeCoords.xyz);
-	//ambient material
-	vec3 la = vec3(0.2, .2, .2);
-	vec3 ka = vec3(1.0, 1.0, 1);
-
-	//specular
-	vec3 ls = vec3(1.0, 1.0, 1.0);
-	vec3 ks = vec3(0.5, 0.5, 0.5);
-	float shininess = 32;
+	
+	float shininess = 1.f;
 
 	vec3 spec = vec3(0);
 

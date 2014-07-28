@@ -29,6 +29,7 @@ struct Edge
 	unsigned int tail; 
 	unsigned int opp; //vertex opposite to an edge in a face
 	unsigned int face; //reference to a face
+	bool		 isRemoved; // initially false
 	int twin;		 //twin edge 
 };
 
@@ -36,14 +37,17 @@ class ObjectSlab
 {
 public:
 	ObjectSlab(std::string filename);
-	void importStream(std::string filename);
+	bool importStream(std::string filename);
 	void createEdges();
 	void connectTwinEdges();
 	void subdivide(int idx);
-	void render(Camera cam, TrackBall* tb);
-	void select(float mx, float my, Camera cam);
-	bool isSkinny(Edge e, glm::vec3 o);
+	bool isSkinny(const Edge e, const glm::vec3 o);
 	void flipEdge(int ei, int vi);		//flip an edge given a barycentric coordinate and an edge index
+	void formFace(int ei, int vi);
+	int countActiveTriangles();
+	void select(float mx, float my, Camera cam);
+	void render(Camera cam, TrackBall* tb);
+	void idle();
 	~ObjectSlab(void);
 
 private:

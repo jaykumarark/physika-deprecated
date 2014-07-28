@@ -52,6 +52,7 @@ public:
 	void setNearFar(float near, float far);
 	void setVelocity(float speed);
 	float velocity();
+	void rotateCamera();
 
 	const float vAngle();
 	const float hAngle();

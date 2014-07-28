@@ -14,6 +14,8 @@
 #include "PObject.h"
 #include "ObjectSlab.h"
 #include "PickingRay.h"
+#include "TreeSystem.h"
+#include "Light.h"
 #include <time.h>
 
 int gwidth = 1024;
@@ -24,6 +26,9 @@ TrackBall* trackBall;
 PlaneGrid* plane; 
 ObjectSlab* triangle; 
 PObject* teapot;
+Light* sceneLight; 
+TreeSystem* fractal; 
+
  
 //Keyboard variables
 bool keyStates[256];
@@ -35,8 +40,8 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(1.f, 3000.f);
-	cam.setPosition(glm::vec3(10, 10, 20));
-	cam.lookAt(glm::vec3(-5, 0, 0.0));
+	cam.setPosition(glm::vec3(0, 20, 20));
+	cam.lookAt(glm::vec3(0, 0, 0.0));
 	cam.setVelocity(2);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
 }
@@ -46,9 +51,12 @@ void initOpengl()
 	glEnable(GL_DEPTH_TEST);
 	initCamera();
 	trackBall			= new TrackBall(gwidth, gheight);
-	plane				= new PlaneGrid(glm::vec3(0,0,0), 64, 64);	
-	teapot				= new PObject("models/teapot.obj");
+	plane				= new PlaneGrid(glm::vec3(0,0,0), 64, 64, glm::vec3(1), glm::vec3(1), glm::vec3(0.0));	
+	teapot				= new PObject("models/teapot.obj", glm::vec3(1), glm::vec3(1), glm::vec3(0.0));
 	triangle			= new ObjectSlab("models/box.obj");
+	sceneLight			= new Light(glm::vec3(50, 10, 0), glm::vec3(0.2, 0.2, 0.2), glm::vec3(1, 1, 1),glm::vec3(0));
+	fractal				= new TreeSystem();
+	fractal->writeRules();
 }
 
 
@@ -57,9 +65,11 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//teapot->render(cam, trackBall); 
-	//plane->render(cam, trackBall);
-	triangle->render(cam, trackBall);
+	teapot->render(cam, trackBall, sceneLight); 
+	plane->render(cam, trackBall, sceneLight);
+	//fractal->render(cam, trackBall);
+	sceneLight->render(cam, trackBall);
+	//triangle->render(cam, trackBall);
 	glutPostRedisplay();
 	glutSwapBuffers();
 }
@@ -162,6 +172,11 @@ void idle()
 {
 	float dt= 0.1;
 	processKeyboard(dt);
+	if(keyStates['P'] || keyStates['p'])
+	{
+		triangle->idle();
+	}
+	sceneLight->idle();
 }
 
 void createGlutCallBacks()

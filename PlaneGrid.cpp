@@ -1,7 +1,7 @@
 #include "PlaneGrid.h"
 
 
-PlaneGrid::PlaneGrid(glm::vec3 p, float w, float h)
+PlaneGrid::PlaneGrid(glm::vec3 p, float w, float h, glm::vec3 a, glm::vec3 d, glm::vec3 s)
 {
 	mPos = p;
 	mW = w;
@@ -11,12 +11,20 @@ PlaneGrid::PlaneGrid(glm::vec3 p, float w, float h)
 	m_shader = new GLSLShader("gridVS.glsl", "gridFS.glsl");
 	m_model = glm::mat4(1.f);
 	init();
+	setMaterial(a, d, s);
 }
 
 PlaneGrid::~PlaneGrid(void)
 {
 	delete m_vbo;
 	delete m_shader;
+}
+
+void PlaneGrid::setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s)
+{
+	m_material.Ka = a; 
+	m_material.Kd = d; 
+	m_material.Ks = s; 
 }
 
 void PlaneGrid::init()
@@ -104,10 +112,14 @@ void PlaneGrid::init()
 }
 
 
-void PlaneGrid::render(Camera cam, TrackBall* tb)
+void PlaneGrid::render(Camera cam, TrackBall* tb, Light* light)
 {
-	//mTex->activate(sample, GL_TEXTURE0, 0);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT, GL_FILL);
+
+	//Light Position
+	Light::LightProperties lprops = light->properties();
+	glm::vec4 lp = glm::vec4(light->position(), 1.f);
+
 	m_shader->use();
 
 	glm::mat4 m = cam.matrix() * tb->matrix() * m_model;
@@ -120,15 +132,17 @@ void PlaneGrid::render(Camera cam, TrackBall* tb)
 	m_shader->setUniform("NormalMatrix", normalMatrix);	
 
 	//Light Position
-	glm::vec4 lp = cam.view() * m_model * glm::vec4(0,50,0,1);
-	//glm::vec4 lp = glm::vec4(0,50,0,1);
 	m_shader->setUniform("lightPosition", lp);
-	//Material 
-	glm::vec3 kd = glm::vec3(1.f, 1.f, 1.f);
-	m_shader->setUniform("kd", kd);
-	//Light intensity
-	glm::vec3 ld = glm::vec3(1.f, 1.f, 1.f);
-	m_shader->setUniform("ld", ld);
+
+	//Setup Material 
+	m_shader->setUniform("ka", m_material.Ka);
+	m_shader->setUniform("kd", m_material.Kd);
+	m_shader->setUniform("ks", m_material.Ks);
+
+	//Setup Lights
+	m_shader->setUniform("la", lprops.Ia);
+	m_shader->setUniform("ld", lprops.Id);
+	m_shader->setUniform("ls", lprops.Is);
 
 	m_vbo->render();
 

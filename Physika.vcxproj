@@ -89,6 +89,7 @@
     <ClCompile Include="GLSLShader.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="image.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
@@ -99,8 +100,8 @@
     <ClCompile Include="PObject.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="trackball.cpp" />
+    <ClCompile Include="TreeSystem.cpp" />
     <ClCompile Include="VertexBufferObject.cpp" />
-    <ClCompile Include="voxelgrid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="diffuseFS.glsl" />
@@ -108,6 +109,8 @@
     <None Include="fs.glsl" />
     <None Include="gridFS.glsl" />
     <None Include="gridVS.glsl" />
+    <None Include="LightFS.glsl" />
+    <None Include="LightVS.glsl" />
     <None Include="vs.glsl" />
   </ItemGroup>
   <ItemGroup>
@@ -116,6 +119,7 @@
     <ClInclude Include="GLSLShader.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="image.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="NewGrid.h" />
@@ -125,9 +129,9 @@
     <ClInclude Include="PObject.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="trackball.h" />
+    <ClInclude Include="TreeSystem.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="VertexBufferObject.h" />
-    <ClInclude Include="voxelgrid.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

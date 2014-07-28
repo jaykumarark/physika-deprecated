@@ -42,9 +42,6 @@
     <ClCompile Include="grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="voxelgrid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NewGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,6 +66,12 @@
     <ClCompile Include="PickingRay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TreeSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fs.glsl">
@@ -87,6 +90,12 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="diffuseVS.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="LightVS.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="LightFS.glsl">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
@@ -115,9 +124,6 @@
     <ClInclude Include="grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="voxelgrid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NewGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -140,6 +146,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PickingRay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

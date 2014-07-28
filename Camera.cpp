@@ -1,6 +1,6 @@
 #include "camera.h"
 #include <cmath>
-
+#define GLM_SWIZZLE
 #define M_PI 3.14159265358979323846
 
 
@@ -13,7 +13,7 @@ Camera::Camera(void):
 	mFar(100.f), 
 	mAsp(4.0/3.0f)
 {
-	
+
 }
 
 	Camera::~Camera(void)
