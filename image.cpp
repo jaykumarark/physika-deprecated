@@ -6,11 +6,22 @@ Image::Image(std::string filename)
 	load(filename);
 }
 
-
+Image::~Image(void)
+{
+	SOIL_free_image_data(mData);
+}
 
 void Image::load(std::string filename)
 {
-	image = SOIL_load_image(filename.c_str(), &mwidth, &mheight, 0, SOIL_LOAD_RGB);
+	mData = SOIL_load_image(filename.c_str(), &mwidth, &mheight, 0, SOIL_LOAD_RGB);
+	if(mData == NULL)
+	{
+		std::cerr<<"Could not load image "<<filename.c_str()<<std::endl; 
+		std::cout<<"Exiting... "<<std::endl;
+		std::cout<<"Press any key to exit."<<std::endl;
+		std::cin.get();
+		std::exit(EXIT_FAILURE);
+	}
 	mHeightMap = new float[mwidth*mheight];
 }
 
@@ -26,12 +37,9 @@ int Image::height()
 
 unsigned char* Image::data()
 {
-	return image;
+	return mData;
 }
-Image::~Image(void)
-{
-	SOIL_free_image_data(image);
-}
+
 
 
 void Image::makeHeightMap()
@@ -41,7 +49,7 @@ void Image::makeHeightMap()
 	{
 		for(int j = 0; j < mheight; j++)
 		{
-			mHeightMap[(j+(mheight*i))] = (float)image[k]/255;
+			mHeightMap[(j+(mheight*i))] = (float)mData[k]/255;
 			k+=3;
 		}
 	}

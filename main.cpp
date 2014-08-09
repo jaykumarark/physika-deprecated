@@ -24,7 +24,6 @@ int gheight = 768;
 Camera cam;
 TrackBall* trackBall;
 PlaneGrid* plane; 
-ObjectSlab* triangle; 
 PObject* teapot;
 Light* sceneLight; 
 TreeSystem* fractal; 
@@ -51,10 +50,24 @@ void initOpengl()
 	glEnable(GL_DEPTH_TEST);
 	initCamera();
 	trackBall			= new TrackBall(gwidth, gheight);
-	plane				= new PlaneGrid(glm::vec3(0,0,0), 64, 64, glm::vec3(1), glm::vec3(1), glm::vec3(0.0));	
-	teapot				= new PObject("models/teapot.obj", glm::vec3(1), glm::vec3(1), glm::vec3(0.0));
-	triangle			= new ObjectSlab("models/box.obj");
-	sceneLight			= new Light(glm::vec3(50, 10, 0), glm::vec3(0.2, 0.2, 0.2), glm::vec3(1, 1, 1),glm::vec3(0));
+	plane				= new PlaneGrid(glm::vec3(0,0,0), 
+										64, 64, 
+										glm::vec3(1), 
+										glm::vec3(1), 
+										glm::vec3(0.0),
+										"textures/floor.png",
+										"gridVS.glsl", 
+										"gridFS.glsl");	
+
+	teapot				= new PObject("models/Torus.obj",
+									  "textures/grass.jpg",
+									  "vs.glsl",
+									  "fs.glsl",
+									  glm::vec3(1), 
+									  glm::vec3(1), 
+									  glm::vec3(0.0));
+
+	sceneLight			= new Light(glm::vec3(20, 10, 0), glm::vec3(0.2, 0.2, 0.2), glm::vec3(1, 1, 1),glm::vec3(0));
 	fractal				= new TreeSystem();
 	fractal->writeRules();
 }
@@ -67,9 +80,7 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	teapot->render(cam, trackBall, sceneLight); 
 	plane->render(cam, trackBall, sceneLight);
-	//fractal->render(cam, trackBall);
-	sceneLight->render(cam, trackBall);
-	//triangle->render(cam, trackBall);
+	//sceneLight->render(cam, trackBall);
 	glutPostRedisplay();
 	glutSwapBuffers();
 }
@@ -106,7 +117,7 @@ void mouse(int button, int state, int x, int y)
 {
 	if(state == GLUT_DOWN && button == GLUT_MIDDLE_BUTTON)
 	{
-		triangle->select(x, y, cam);
+		//triangle->select(x, y, cam);
 	}
 
 	if(state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)
@@ -174,9 +185,9 @@ void idle()
 	processKeyboard(dt);
 	if(keyStates['P'] || keyStates['p'])
 	{
-		triangle->idle();
+		//triangle->idle();
 	}
-	sceneLight->idle();
+	sceneLight->update();
 }
 
 void createGlutCallBacks()

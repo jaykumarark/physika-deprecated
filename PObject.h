@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "trackball.h"
 #include "Light.h"
-
+#include "texture.h"
 
 
 class PObject
@@ -20,7 +20,13 @@ public:
 	};
 
 
-	PObject(std::string filename, glm::vec3 a, glm::vec3 d, glm::vec3 s);
+	PObject(std::string modelFile, 
+			std::string textureFile, 
+			std::string vertexFile, 
+			std::string fragmentFile,
+			glm::vec3 a, 
+			glm::vec3 d, 
+			glm::vec3 s);
 	void init();
 	void render(Camera cam, TrackBall* tb, Light* light);
 	void setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s);
@@ -32,5 +38,8 @@ private:
 	ModelLoader* m_objLoader;
 	glm::mat4 m_model;		//model matrix is specific to each object and not global
 	Material m_material;
+	Texture* m_tex;
+	std::string m_vertexFile;
+	std::string m_fragmentFile;
 };
 

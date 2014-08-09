@@ -5,7 +5,7 @@ Cube::Cube(glm::vec3 d, glm::vec3 p)
 {
 	dim = d; 
 	pos = p; 
-	tex = new Texture(GL_TEXTURE_2D, "textures/blue.png");
+	tex = new Texture(GL_TEXTURE_2D, "textures/blue.png",GL_REPEAT, GL_LINEAR, GL_LINEAR);
 	computeVerts();
 	computeIndices();
 	computeTexCoords();
@@ -227,7 +227,7 @@ void Cube::computeIndices()
 
 void Cube::render(int pos_loc, int color_loc, int tex_loc, int sample)
 {
-	tex->activate(sample, GL_TEXTURE0, 0);
+	//tex->activate(sample, GL_TEXTURE0, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 	glVertexAttribPointer(pos_loc, 3, GL_FLOAT,GL_FALSE, 0, 0);

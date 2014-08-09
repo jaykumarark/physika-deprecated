@@ -7,7 +7,7 @@ NewGrid::NewGrid(glm::vec3 p, int w, int h, int cs)
 	m_width = w; 
 	m_height = h; 
 	m_cellsize = cs;
-	m_texture = new Texture(GL_TEXTURE_2D, "textures/grass.jpg");
+	m_texture = new Texture(GL_TEXTURE_2D, "textures/grass.jpg", GL_REPEAT, GL_LINEAR, GL_LINEAR);
 	init();
 }
 
@@ -134,7 +134,7 @@ void NewGrid::initBuffers()
 
 void NewGrid::render(int pos, int color, int normal, int tex_loc, int sample)
 {
-	m_texture->activate(sample, GL_TEXTURE0, 0);
+//	m_texture->activate(sample, GL_TEXTURE0, 0);
 
 	glPolygonMode( GL_FRONT, GL_LINE );
 	glBindBuffer(GL_ARRAY_BUFFER, m_vb);

@@ -11,17 +11,26 @@ using namespace std;
 class Texture
 {
 public:
-	Texture(GLenum TextureTarget, string filename);
-	bool load();
-	void activate(int location, GLenum textureUnit, GLushort unit);
-	~Texture(void);
+	Texture(GLenum TextureTarget, string filename, GLint wrap, GLfloat minFilter, GLfloat magFilter);
+   ~Texture(void);
+   /*
+	textureUnit e.g., GL_TEXTURE0
+	unit e.g. 0	
+   */
+	void activate(GLenum textureUnit);
+	void deactivate();
+
 private:
-	void init();
-	
+	void init();	
 	GLenum mTarget;
 	GLuint mTextureId;
 	Image* mImage;
-	string mFilename; 
+
+	//texture params
+	GLint m_wrap; 
+	GLfloat m_magFilter; 
+	GLfloat m_minFilter;
+
 };
 
 

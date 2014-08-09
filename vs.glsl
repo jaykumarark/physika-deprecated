@@ -36,6 +36,7 @@ void main()
 	vec3 tnorm = vec3(NormalMatrix * vec4(VertexNormal,0));
 	vec4 eyeCoords = ModelViewMatrix * vec4(VertexPosition, 1.0);
 	vec3 s = normalize( vec3(lightPosition - eyeCoords));
+	s = vec3(0,1,1);
 	vec3 r = reflect(-s, tnorm);
 	vec3 v = normalize(-eyeCoords.xyz);
 	

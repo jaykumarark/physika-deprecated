@@ -1,15 +1,23 @@
 #include "PlaneGrid.h"
 
 
-PlaneGrid::PlaneGrid(glm::vec3 p, float w, float h, glm::vec3 a, glm::vec3 d, glm::vec3 s)
+PlaneGrid::PlaneGrid(glm::vec3 p, 
+					 float w, 
+					 float h, 
+					 glm::vec3 a, 
+					 glm::vec3 d, 
+					 glm::vec3 s, 
+					 std::string textureFile, 
+					 std::string vertexFile, 
+					 std::string fragmentFile)
 {
 	mPos = p;
 	mW = w;
 	mH = h;
-	//mTex = new Texture(GL_TEXTURE_2D, "textures/gridtexture128.jpg");
+	mTex = new Texture(GL_TEXTURE_2D, textureFile, GL_REPEAT, GL_NEAREST, GL_NEAREST);
 	m_vbo = new VertexBufferObject(GL_ARRAY_BUFFER, GL_TRIANGLES);
-	m_shader = new GLSLShader("gridVS.glsl", "gridFS.glsl");
-	m_model = glm::mat4(1.f);
+	m_shader = new GLSLShader(vertexFile.c_str(), fragmentFile.c_str());
+	m_model = glm::translate(glm::mat4(1.f), glm::vec3(0, - 20, 0));
 	init();
 	setMaterial(a, d, s);
 }
@@ -41,10 +49,10 @@ void PlaneGrid::init()
 	glm::vec3 p3 = glm::vec3(mPos.x-(mW/2), 0, mPos.z+(mH/2));
 	glm::vec3 p4 = glm::vec3(mPos.x+(mW/2), 0, mPos.z+(mH/2));
 
-	glm::vec2 t1 = glm::vec2(p1.x/mW, p1.z/mH);
-	glm::vec2 t2 = glm::vec2(p2.x/mW, p2.z/mH);
-	glm::vec2 t3 = glm::vec2(p3.x/mW, p3.z/mH);
-	glm::vec2 t4 = glm::vec2(p4.x/mW, p4.z/mH);
+	glm::vec2 t1 = 6.f * glm::vec2(p1.x/mW, p1.z/mH);
+	glm::vec2 t2 = 6.f * glm::vec2(p2.x/mW, p2.z/mH);
+	glm::vec2 t3 = 6.f * glm::vec2(p3.x/mW, p3.z/mH);
+	glm::vec2 t4 = 6.f * glm::vec2(p4.x/mW, p4.z/mH);
 	
 	verts.push_back(p1);
 	verts.push_back(p2);
@@ -122,12 +130,16 @@ void PlaneGrid::render(Camera cam, TrackBall* tb, Light* light)
 
 	m_shader->use();
 
+	//setup textures
+	mTex->activate(GL_TEXTURE0);
+	m_shader->setSampler("TextureSample2D", 0);
+
+	//Setting up Matrices
 	glm::mat4 m = cam.matrix() * tb->matrix() * m_model;
 	glm::mat4 normalMatrix = glm::transpose(cam.view() * tb->matrix() * m_model);
 
-	//Setting up Matrices
 	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
-	m_shader->setUniform("ModelViewMatrix", cam.view() * m_model);	//uniform mat4 ModelViewMatrix;
+	m_shader->setUniform("ModelViewMatrix",  m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
 	m_shader->setUniform("NormalMatrix", normalMatrix);	
 
@@ -146,6 +158,7 @@ void PlaneGrid::render(Camera cam, TrackBall* tb, Light* light)
 
 	m_vbo->render();
 
+	mTex->deactivate();
 	m_shader->disuse();
 }
 

@@ -25,6 +25,7 @@ public:
 	void setUniform(const GLchar* name, glm::mat4 m);
 	void setUniform(const GLchar* name, glm::vec3);
 	void setUniform(const GLchar* name, glm::vec4);
+	void setSampler(const GLchar* name, GLushort unit);
 
 private:
 	char* file_read(const char* filename);

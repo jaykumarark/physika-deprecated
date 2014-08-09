@@ -1,39 +1,43 @@
 #include "texture.h"
 
 
-Texture::Texture(GLenum TextureTarget, string filename)
+Texture::Texture(GLenum TextureTarget, string filename, GLint wrap, GLfloat minFilter, GLfloat magFilter)
 {
 	mTarget = TextureTarget;
-	mFilename = filename;
-	mImage = NULL;
+	m_wrap = wrap;
+	m_minFilter = minFilter;
+	m_magFilter = magFilter;
+	mImage = new Image(filename);
 	init();
-	load();
+}
+
+Texture::~Texture(void)
+{
+	glDeleteTextures(1, &mTextureId);
+	delete mImage;	
 }
 
 void Texture::init()
 {
-	glGenTextures(1, &mTextureId);
-	glBindTexture(mTarget, mTextureId);
-	mImage = new Image(mFilename);
+	glGenTextures  (1, &mTextureId);	
+	glBindTexture  (mTarget, mTextureId);
+	glTexImage2D   (mTarget, 0, GL_RGB, mImage->width(), mImage->height(), 0, GL_RGB, GL_UNSIGNED_BYTE, mImage->data());
+	glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, m_minFilter);
+	glTexParameterf(mTarget, GL_TEXTURE_MAG_FILTER, m_magFilter);
+	glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, m_wrap);
+	glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, m_wrap);
+	glBindTexture  (mTarget, 0);	//unbind
 }
 
-bool Texture::load()
-{
-	glTexImage2D(mTarget, 0, GL_RGB, mImage->width(), mImage->height(), 0, GL_RGB, GL_UNSIGNED_BYTE, mImage->data());
-	glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	return true;			//change this later
-}
-
-void Texture::activate(int location, GLenum textureUnit, GLushort unit)
+void Texture::activate(GLenum textureUnit)
 {
 	glActiveTexture(textureUnit);
 	glBindTexture(mTarget, mTextureId);
-	glUniform1i(location, unit);
-};
-
-Texture::~Texture(void)
-{
 }
+
+void Texture::deactivate()
+{
+	glBindTexture(mTarget, 0);
+}
+
+

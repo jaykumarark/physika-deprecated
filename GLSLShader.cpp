@@ -76,6 +76,15 @@ void GLSLShader::setUniform(const GLchar* name, glm::mat4 m)
 	}
 }
 
+void GLSLShader::setSampler(const GLchar* name, GLushort unit)
+{
+	GLint loc = getUniformLocation(name);
+	if(loc!=-1)
+	{
+		glUniform1i(loc, unit);
+	}
+}
+
 void GLSLShader::addVertexShader(const char *vfile)
 {
 	std::string vstr(vfile);

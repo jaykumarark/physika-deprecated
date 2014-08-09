@@ -23,6 +23,7 @@ Light::~Light(void)
 glm::vec3 Light::position()
 {
 	return (m_model * glm::vec4(m_pos, 1)).swizzle(X,Y,Z);
+	//return m_pos;
 }
 
 Light::LightProperties Light::properties()
@@ -30,7 +31,7 @@ Light::LightProperties Light::properties()
 	return m_props;
 }
 
-void Light::idle()
+void Light::update()
 {
 	m_angle += 0.5; 
 	

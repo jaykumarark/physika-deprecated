@@ -24,7 +24,7 @@ public:
 	glm::vec3 position();
 	LightProperties properties(); 
 	void setProperty(glm::vec3 a, glm::vec3 d, glm::vec3 s);
-	void idle();
+	void update();
 	
 
 private:

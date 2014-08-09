@@ -22,7 +22,15 @@ struct Material
 class PlaneGrid
 {
 public:
-	PlaneGrid(glm::vec3 p, float w, float h, glm::vec3 a, glm::vec3 d, glm::vec3 s);
+	PlaneGrid(glm::vec3 p, 
+		float w, 
+		float h, 
+		glm::vec3 a, 
+		glm::vec3 d, 
+		glm::vec3 s,
+		std::string textureFile, 
+		std::string vertexFile, 
+		std::string fragmentFile);
 	~PlaneGrid(void);
 	void render(Camera cam, TrackBall* tb, Light* light);
 	void setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s);

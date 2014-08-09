@@ -2,12 +2,13 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 #include <iostream>
+#include <assert.h>
 #include <SOIL.h>
 
 class Image
 {
 private:
-	unsigned char* image;
+	unsigned char* mData;
 	int mwidth; 
 	int mheight; 
 	float *mHeightMap;

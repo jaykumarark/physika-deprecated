@@ -2,12 +2,22 @@
 #define GLM_SWIZZLE
 
 
-PObject::PObject(std::string filename, glm::vec3 a, glm::vec3 d, glm::vec3 s)
+PObject::PObject(std::string modelFile, 
+				 std::string textureFile,
+				 std::string vertexFile, 
+				 std::string fragmentFile,
+				 glm::vec3 a, 
+				 glm::vec3 d, 
+				 glm::vec3 s)
 {
-	m_objLoader = new ModelLoader(filename);
+	m_objLoader = new ModelLoader(modelFile);
 	m_vbo = new VertexBufferObject(GL_ARRAY_BUFFER, GL_TRIANGLES);
+	m_tex = new Texture(GL_TEXTURE_2D, textureFile,GL_REPEAT, GL_LINEAR, GL_LINEAR);
+	m_vertexFile = vertexFile;
+	m_fragmentFile = fragmentFile;
 	init();
 	setMaterial(a, d, s);
+
 }
 
 PObject::~PObject(void)
@@ -15,6 +25,7 @@ PObject::~PObject(void)
 	delete m_vbo;
 	delete m_shader;
 	delete m_objLoader;
+	delete m_tex;
 }
 
 void PObject::setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s)
@@ -27,8 +38,8 @@ void PObject::setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s)
 void PObject::init()
 {
 	m_vbo->init(m_objLoader->data(), m_objLoader->indices());
-	m_shader = new GLSLShader("vs.glsl", "fs.glsl");
-	m_model = glm::mat4(1.f);
+	m_shader = new GLSLShader(m_vertexFile.c_str(), m_fragmentFile.c_str());
+	m_model = glm::scale(glm::mat4(1.0),glm::vec3(4, 4, 4));
 	
 }
 
@@ -40,12 +51,18 @@ void PObject::render(Camera cam, TrackBall* tb, Light* light)
 	glm::vec4 lp = glm::vec4(light->position(), 1.f); 
 
 	m_shader->use();
+
+	//Setup Texture 
+	m_tex->activate(GL_TEXTURE0);
+	m_shader->setSampler("TextureSample2D",0);
+
+
 	glm::mat4 m = cam.matrix() * tb->matrix() * m_model;
 	glm::mat4 normalMatrix = glm::transpose(cam.view() * tb->matrix() * m_model);
 
 	//Setting up Matrices
 	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
-	m_shader->setUniform("ModelViewMatrix", cam.view() * m_model);	//uniform mat4 ModelViewMatrix;
+	m_shader->setUniform("ModelViewMatrix", m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
 	m_shader->setUniform("NormalMatrix", normalMatrix);				//uniform mat4 NormalMatrix;
 
@@ -64,5 +81,6 @@ void PObject::render(Camera cam, TrackBall* tb, Light* light)
 	
 	m_vbo->render();
 
+	m_tex->deactivate();
 	m_shader->disuse();
 }
