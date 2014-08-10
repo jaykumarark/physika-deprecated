@@ -12,7 +12,7 @@ PObject::PObject(std::string modelFile,
 {
 	m_objLoader = new ModelLoader(modelFile);
 	m_vbo = new VertexBufferObject(GL_ARRAY_BUFFER, GL_TRIANGLES);
-	m_tex = new Texture(GL_TEXTURE_2D, textureFile,GL_REPEAT, GL_LINEAR, GL_LINEAR);
+	m_tex = new Texture(GL_TEXTURE_2D, textureFile, GL_REPEAT, GL_LINEAR, GL_LINEAR);
 	m_vertexFile = vertexFile;
 	m_fragmentFile = fragmentFile;
 	init();
@@ -56,18 +56,16 @@ void PObject::render(Camera cam, TrackBall* tb, Light* light)
 	m_tex->activate(GL_TEXTURE0);
 	m_shader->setSampler("TextureSample2D",0);
 
-
-	glm::mat4 m = cam.matrix() * tb->matrix() * m_model;
-	glm::mat4 normalMatrix = glm::transpose(cam.view() * tb->matrix() * m_model);
+	glm::mat4 m = cam.matrix() * m_model;
+	glm::mat4 normalMatrix = glm::transpose((cam.view() * m_model));
 
 	//Setting up Matrices
-	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
-	m_shader->setUniform("ModelViewMatrix", m_model);	//uniform mat4 ModelViewMatrix;
+	m_shader->setUniform("ModelViewMatrix", cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
 	m_shader->setUniform("NormalMatrix", normalMatrix);				//uniform mat4 NormalMatrix;
 
 	//Light Position
-	m_shader->setUniform("lightPosition", lp);
+	m_shader->setUniform("lightPosition", cam.view() * m_model * lp);
 	
 	//Setup Material 
 	m_shader->setUniform("ka", m_material.Ka);

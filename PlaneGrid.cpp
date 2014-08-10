@@ -17,7 +17,7 @@ PlaneGrid::PlaneGrid(glm::vec3 p,
 	mTex = new Texture(GL_TEXTURE_2D, textureFile, GL_REPEAT, GL_NEAREST, GL_NEAREST);
 	m_vbo = new VertexBufferObject(GL_ARRAY_BUFFER, GL_TRIANGLES);
 	m_shader = new GLSLShader(vertexFile.c_str(), fragmentFile.c_str());
-	m_model = glm::translate(glm::mat4(1.f), glm::vec3(0, - 20, 0));
+	m_model = glm::mat4(1.f);
 	init();
 	setMaterial(a, d, s);
 }
@@ -49,10 +49,10 @@ void PlaneGrid::init()
 	glm::vec3 p3 = glm::vec3(mPos.x-(mW/2), 0, mPos.z+(mH/2));
 	glm::vec3 p4 = glm::vec3(mPos.x+(mW/2), 0, mPos.z+(mH/2));
 
-	glm::vec2 t1 = 6.f * glm::vec2(p1.x/mW, p1.z/mH);
-	glm::vec2 t2 = 6.f * glm::vec2(p2.x/mW, p2.z/mH);
-	glm::vec2 t3 = 6.f * glm::vec2(p3.x/mW, p3.z/mH);
-	glm::vec2 t4 = 6.f * glm::vec2(p4.x/mW, p4.z/mH);
+	glm::vec2 t1 = 8.f * glm::vec2(p1.x/mW, p1.z/mH);
+	glm::vec2 t2 = 8.f * glm::vec2(p2.x/mW, p2.z/mH);
+	glm::vec2 t3 = 8.f * glm::vec2(p3.x/mW, p3.z/mH);
+	glm::vec2 t4 = 8.f * glm::vec2(p4.x/mW, p4.z/mH);
 	
 	verts.push_back(p1);
 	verts.push_back(p2);
@@ -119,7 +119,6 @@ void PlaneGrid::init()
 	m_vbo->init(data, indices);
 }
 
-
 void PlaneGrid::render(Camera cam, TrackBall* tb, Light* light)
 {
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -139,12 +138,12 @@ void PlaneGrid::render(Camera cam, TrackBall* tb, Light* light)
 	glm::mat4 normalMatrix = glm::transpose(cam.view() * tb->matrix() * m_model);
 
 	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
-	m_shader->setUniform("ModelViewMatrix",  m_model);	//uniform mat4 ModelViewMatrix;
+	m_shader->setUniform("ModelViewMatrix",  cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
 	m_shader->setUniform("NormalMatrix", normalMatrix);	
 
 	//Light Position
-	m_shader->setUniform("lightPosition", lp);
+	m_shader->setUniform("lightPosition", cam.view() * m_model * lp);
 
 	//Setup Material 
 	m_shader->setUniform("ka", m_material.Ka);
