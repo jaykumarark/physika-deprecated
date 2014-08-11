@@ -45,7 +45,6 @@ public:
 			int w, 
 			int h, 
 			int cs,
-			int elevation,
 			std::string textureFile, 
 			std::string vertexFile, 
 			std::string fragmentFile,

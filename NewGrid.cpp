@@ -14,6 +14,7 @@ NewGrid::NewGrid(glm::vec3 p,
 {
 	m_pos = p;
 	m_cs = cs;
+	m_elevation = elevation;
 	m_Heightmap = new Image(heightMapFile, true);
 	mW = m_Heightmap->width(); 
 	mH= m_Heightmap->height(); 
@@ -29,7 +30,6 @@ NewGrid::NewGrid(glm::vec3 p,
 				 int w, 
 				 int h, 
 				 int cs,
-				 int elevation,
 				 std::string textureFile, 
 				 std::string vertexFile, 
 				 std::string fragmentFile,
@@ -72,23 +72,22 @@ void NewGrid::init()
 	int nopy = ystart - yend;
 	int W = nopx -1 ; 
 	int H = nopy -1;
-	int x = 0; 
-	int y = 0;
+
 	for(int i = ystart; i > yend; i--)
 	{
-		x = 0;
 		for(int j = xstart; j < xend; j++)
 		{
 			glm::vec3 v;
 			if(m_Heightmap != NULL)
 			{
+				int x = j + 64; 
+				int y = -(i - 64);
+				//cout<<"x "<<x<<" y "<<y<<endl;*/
+
 				float percent = m_Heightmap->getColorAt(x, y);
 				//float percent = 0;
+
 				v  = glm::vec3(j*m_cs, m_elevation * percent, i*m_cs);
-				x++; 
-				
-				cout<<"x " <<x; 
-				cout<<" y "<<y<<endl;
 			}
 			else{
 				v  = glm::vec3(j*m_cs, 0 , i*m_cs);
@@ -97,7 +96,6 @@ void NewGrid::init()
 			verts.push_back(v);
 			tcoords.push_back(t);
 		}
-		y++;
 	}
 
 	//create indices for the NewGrid
