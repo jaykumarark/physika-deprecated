@@ -7,7 +7,7 @@ Texture::Texture(GLenum TextureTarget, string filename, GLint wrap, GLfloat minF
 	m_wrap = wrap;
 	m_minFilter = minFilter;
 	m_magFilter = magFilter;
-	mImage = new Image(filename);
+	mImage = new Image(filename, false);
 	init();
 }
 

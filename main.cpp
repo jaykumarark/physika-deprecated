@@ -9,13 +9,11 @@
 #include <math.h>
 #include "Camera.h"
 #include "TrackBall.h"
-#include "cube.h"
 #include "PlaneGrid.h"
-#include "PObject.h"
-#include "ObjectSlab.h"
-#include "PickingRay.h"
+#include "PObject.h"`
 #include "TreeSystem.h"
 #include "Light.h"
+#include "NewGrid.h"
 #include <time.h>
 
 int gwidth = 1024;
@@ -27,6 +25,7 @@ PlaneGrid* plane;
 PObject* teapot;
 Light* sceneLight; 
 TreeSystem* fractal; 
+NewGrid* terrain;
 
  
 //Keyboard variables
@@ -50,24 +49,38 @@ void initOpengl()
 	glEnable(GL_DEPTH_TEST);
 	initCamera();
 	trackBall			= new TrackBall(gwidth, gheight);
-	plane				= new PlaneGrid(glm::vec3(0,-20,0), 
+	plane				= new PlaneGrid(glm::vec3(0,0,0), 
 										64, 64, 
 										glm::vec3(1), 
 										glm::vec3(1), 
 										glm::vec3(0.0),
 										"textures/floor.png",
 										"gridVS.glsl", 
-										"gridFS.glsl");	
+										"gridFS.glsl");
 
-	teapot				= new PObject("models/teapot.obj",
+	terrain					= new NewGrid(glm::vec3(0,0,0), 
+										 2, 
+										 50.f, 
+										"textures/grass.jpg",
+										"textures/perlin2.jpg",
+										"terrainVS.glsl", 
+										"terrainFS.glsl", 
+										glm::vec3(1), 
+										glm::vec3(1), 
+										glm::vec3(0.0));
+
+	/*teapot				= new PObject(glm::vec3(0,10,0),"models/ogre.obj",
 									  "textures/grass.jpg",
 									  "diffuseVS.glsl",
 									  "diffuseFS.glsl",
 									  glm::vec3(1), 
-									  glm::vec3(0.4), 
-									  glm::vec3(0.8));
+									  glm::vec3(0.5), 
+									  glm::vec3(0.9));*/
 
-	sceneLight			= new Light(glm::vec3(0, 20, 20), glm::vec3(0.2, 0.2, 0.2), glm::vec3(0.5, 0.5, 0.5),glm::vec3(0.9));
+	sceneLight			= new Light(glm::vec3(0, 20, 20), 
+									glm::vec3(0.2, 0.2, 0.2), 
+									glm::vec3(0.5, 0.5, 0.5),
+									glm::vec3(0.9));
 	fractal				= new TreeSystem();
 	fractal->writeRules();
 }
@@ -78,8 +91,9 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	teapot->render(cam, trackBall, sceneLight); 
-	plane->render(cam, trackBall, sceneLight);
+	//teapot->render(cam, trackBall, sceneLight); 
+	//plane->render(cam, trackBall, sceneLight);
+	terrain->render(cam, trackBall, sceneLight);
 	sceneLight->render(cam, trackBall);
 	glutPostRedisplay();
 	glutSwapBuffers();

@@ -110,6 +110,8 @@
     <None Include="gridVS.glsl" />
     <None Include="LightFS.glsl" />
     <None Include="LightVS.glsl" />
+    <None Include="terrainFS.glsl" />
+    <None Include="terrainVS.glsl" />
     <None Include="vs.glsl" />
   </ItemGroup>
   <ItemGroup>

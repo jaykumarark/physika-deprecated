@@ -22,8 +22,8 @@ Light::~Light(void)
 
 glm::vec3 Light::position()
 {
-	//return (m_model * glm::vec4(m_pos, 1)).swizzle(X,Y,Z);
-	return m_pos;
+	return (m_model * glm::vec4(m_pos, 1)).swizzle(X,Y,Z);
+	//return m_pos;
 }
 
 Light::LightProperties Light::properties()
@@ -55,7 +55,7 @@ void Light::render(Camera cam, TrackBall* tb)
 	//glPolygonMode(GL_FRONT, GL_LINE);
 	m_shader->use();
 	m_model = glm::mat4(1);
-	//m_model = glm::rotate(m_model, m_angle, glm::vec3(0, 1, 0));
+	m_model = glm::rotate(m_model, m_angle, glm::vec3(0, 1, 0));
 	m_model = glm::translate(m_model, m_pos);
 	glm::mat4 m = cam.matrix() * m_model;
 

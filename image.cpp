@@ -1,9 +1,13 @@
 #include "image.h"
 
 
-Image::Image(std::string filename)
+Image::Image(std::string filename, bool needHeightMap)
 {
 	load(filename);
+	if(needHeightMap)
+	{
+		makeHeightMap();
+	}
 }
 
 Image::~Image(void)
@@ -39,8 +43,6 @@ unsigned char* Image::data()
 {
 	return mData;
 }
-
-
 
 void Image::makeHeightMap()
 {

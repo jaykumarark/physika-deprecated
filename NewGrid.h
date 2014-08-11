@@ -4,37 +4,72 @@
 #include <vector>
 #include <glm\glm.hpp>
 #include "image.h"
+#include "Camera.h"
+#include "trackball.h"
+#include "Light.h"
+#include "VertexBufferObject.h"
+#include "GLSLShader.h"
+#include "image.h"
 #include "texture.h"
+#include "ModelLoader.h"
 
 class NewGrid
 {
 public:
-	NewGrid(glm::vec3 pos, int w, int h, int cs);
-	void init();
-	void initGrid();
-	void initBuffers();
-	void render(int pos, int color, int normal,int tex_loc, int sample);
+
+	struct Material
+	{
+		glm::vec3 Ka;
+		glm::vec3 Kd;
+		glm::vec3 Ks;
+	};
+
+	/*
+	 for terrains with height maps already presented
+	 use the image width and height as dimension for the 
+	 terrain
+	*/
+
+	NewGrid(glm::vec3 pos, 
+			int cs,
+			int elevation,
+			std::string textureFile, 
+			std::string heightMapFile, 
+			std::string vertexFile, 
+			std::string fragmentFile,
+			glm::vec3 a, 
+			glm::vec3 d,
+			glm::vec3 s);
+
+	NewGrid(glm::vec3 pos, 
+			int w, 
+			int h, 
+			int cs,
+			int elevation,
+			std::string textureFile, 
+			std::string vertexFile, 
+			std::string fragmentFile,
+			glm::vec3 a, 
+			glm::vec3 d,
+			glm::vec3 s);
+
+	void render(Camera cam, TrackBall* tb, Light* light);
+	void setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s);
 	~NewGrid(void);
 private:
-	std::vector<glm::vec3> m_vertices; 
-	std::vector<glm::vec3> m_colors;
-	std::vector<glm::vec2> m_texcoords;
-	std::vector<glm::vec3> m_normals;
-	std::vector<unsigned short> m_indices; 
+	void init();
 
-	
-	GLuint m_vb;				//Vertex Buffers; 
-	GLuint m_cb;				//Color Buffers; 
-	GLuint m_ib;				//Indices Buffers; 
-	GLuint m_nb;				//Normal buffers;
-	GLuint m_tb;				//Texture Coords Buffers;
-	Texture *m_texture	;		//Texture Sample
-
-	int m_width;				//total width along x-axis
-	int m_height;				//total height along y-axis
-	int m_cellsize;				//side of a cell (square)
-	glm::vec3 m_pos;			//centre of the grid
-
+	int mW;					//total width along x-axis
+	int mH;					//total height along y-axis
+	int m_cs;				//side of a cell (square)
+	float m_elevation;		//Max Height of terrain in pixels
+	glm::vec3 m_pos;		//centre of the grid
+	glm::mat4 m_model; 
+	Image* m_Heightmap;
+	Texture* mTex; 
+	GLSLShader* m_shader; 
+	VertexBufferObject* m_vbo; 
+	Material m_material; 
 
 };
 

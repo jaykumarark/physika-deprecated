@@ -35,7 +35,7 @@ void main()
 	vec3 r = reflect(-s, tnorm);
 	vec3 v = normalize(-eyeCoords.xyz);
 
-	float shininess = 0.90; 
+	float shininess = 0.80; 
 	vec3 spec = vec3(0);
 
 	float sdotn = max(dot(s, tnorm), 0.0);
@@ -49,5 +49,6 @@ void main()
 	
 	vec4 texColor = texture(TextureSample2D, fVertexTexture);
 
-	outputColor = vec4(diffuseTerm+ambientTerm, 1.f) * texColor; + vec4(spec, 1.f);
+	//outputColor = vec4(diffuseTerm+ambientTerm, 1.f) * texColor; + vec4(spec, 1.f);
+	outputColor = vec4(1);
 }

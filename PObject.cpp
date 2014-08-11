@@ -2,7 +2,8 @@
 #define GLM_SWIZZLE
 
 
-PObject::PObject(std::string modelFile, 
+PObject::PObject(glm::vec3 p,
+				 std::string modelFile, 
 				 std::string textureFile,
 				 std::string vertexFile, 
 				 std::string fragmentFile,
@@ -15,6 +16,7 @@ PObject::PObject(std::string modelFile,
 	m_tex = new Texture(GL_TEXTURE_2D, textureFile, GL_REPEAT, GL_LINEAR, GL_LINEAR);
 	m_vertexFile = vertexFile;
 	m_fragmentFile = fragmentFile;
+	m_model = glm::translate(glm::mat4(1.0), p);
 	init();
 	setMaterial(a, d, s);
 
@@ -39,7 +41,7 @@ void PObject::init()
 {
 	m_vbo->init(m_objLoader->data(), m_objLoader->indices());
 	m_shader = new GLSLShader(m_vertexFile.c_str(), m_fragmentFile.c_str());
-	m_model = glm::scale(glm::mat4(1.0),glm::vec3(4, 4, 4));
+	m_model = glm::scale(m_model,glm::vec3(4, 4, 4));
 	
 }
 
@@ -57,15 +59,15 @@ void PObject::render(Camera cam, TrackBall* tb, Light* light)
 	m_shader->setSampler("TextureSample2D",0);
 
 	glm::mat4 m = cam.matrix() * m_model;
-	glm::mat4 normalMatrix = glm::transpose((cam.view() * m_model));
+	glm::mat4 normalMatrix = glm::transpose((m_model));
 
 	//Setting up Matrices
-	m_shader->setUniform("ModelViewMatrix", cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
+	m_shader->setUniform("ModelViewMatrix", m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
 	m_shader->setUniform("NormalMatrix", normalMatrix);				//uniform mat4 NormalMatrix;
 
 	//Light Position
-	m_shader->setUniform("lightPosition", cam.view() * m_model * lp);
+	m_shader->setUniform("lightPosition", lp);
 	
 	//Setup Material 
 	m_shader->setUniform("ka", m_material.Ka);

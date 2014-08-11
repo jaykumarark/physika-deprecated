@@ -15,7 +15,7 @@ private:
 	void load(std::string filename); 
 public:
 
-	Image(std::string filename);
+	Image(std::string filename, bool needHeightMap);
 	int width();
 	int height();
 	unsigned char* data();

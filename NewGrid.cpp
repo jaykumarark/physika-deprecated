@@ -1,46 +1,103 @@
 #include "NewGrid.h"
 
 
-NewGrid::NewGrid(glm::vec3 p, int w, int h, int cs)
+NewGrid::NewGrid(glm::vec3 p, 
+				 int cs, 
+				 int elevation,
+				 std::string textureFile, 
+				 std::string heightMapFile, 
+				 std::string vertexFile, 
+				 std::string fragmentFile,
+				 glm::vec3 a, 
+				 glm::vec3 d, 
+				 glm::vec3 s)
 {
 	m_pos = p;
-	m_width = w; 
-	m_height = h; 
-	m_cellsize = cs;
-	m_texture = new Texture(GL_TEXTURE_2D, "textures/grass.jpg", GL_REPEAT, GL_LINEAR, GL_LINEAR);
+	m_cs = cs;
+	m_Heightmap = new Image(heightMapFile, true);
+	mW = m_Heightmap->width(); 
+	mH= m_Heightmap->height(); 
+	mTex = new Texture(GL_TEXTURE_2D, textureFile, GL_REPEAT, GL_LINEAR, GL_LINEAR);
+	m_vbo = new VertexBufferObject(GL_ARRAY_BUFFER, GL_TRIANGLES);
+	m_shader = new GLSLShader(vertexFile.c_str(), fragmentFile.c_str());
+	m_model = glm::mat4(1);
+	setMaterial(a, d, s);
 	init();
 }
 
+NewGrid::NewGrid(glm::vec3 p, 
+				 int w, 
+				 int h, 
+				 int cs,
+				 int elevation,
+				 std::string textureFile, 
+				 std::string vertexFile, 
+				 std::string fragmentFile,
+				 glm::vec3 a, 
+				 glm::vec3 d, 
+				 glm::vec3 s)
+{
+	m_pos = p;
+	mW = w; 
+	mH= h; 
+	m_cs = cs;
+	mTex = new Texture(GL_TEXTURE_2D, textureFile, GL_REPEAT, GL_LINEAR, GL_LINEAR);
+	m_vbo = new VertexBufferObject(GL_ARRAY_BUFFER, GL_TRIANGLES);
+	m_shader = new GLSLShader(vertexFile.c_str(), fragmentFile.c_str());
+	m_model = glm::mat4(1);
+	setMaterial(a, d, s);
+	init();
+}
+
+NewGrid::~NewGrid(void)
+{
+	delete mTex; 
+	delete m_shader; 
+	delete m_vbo;
+}
 
 void NewGrid::init()
 {
-	//init NewGrid
-	initGrid();
+	vector<glm::vec3> verts; 
+	vector<glm::vec2> tcoords;
+	vector<unsigned int> indices; 
+	vector<glm::vec3> normals;
+	vector<ModelLoader::Vertex> data;
 
-	//init Buffers
-	initBuffers();
-}
-
-void NewGrid::initGrid()
-{
-	int xstart = (m_pos.x - (m_width / 2 )) / m_cellsize; 
-	int ystart = (m_pos.y + (m_height / 2)) / m_cellsize; 
-	int xend = ((m_pos.x + (m_width/2))  / m_cellsize) + 1;
-	int yend = ((m_pos.y-(m_height/2)) / m_cellsize) - 1;
+	int xstart = (m_pos.x - (mW / 2 )); 
+	int ystart = (m_pos.y + (mH / 2)); 
+	int xend = ((m_pos.x + (mW/2))) + 1;
+	int yend = ((m_pos.y-(mH/2))) - 1;
 	int nopx = xend - xstart;
 	int nopy = ystart - yend;
+	int W = nopx -1 ; 
+	int H = nopy -1;
+	int x = 0; 
+	int y = 0;
 	for(int i = ystart; i > yend; i--)
 	{
+		x = 0;
 		for(int j = xstart; j < xend; j++)
 		{
-			glm::vec3 v  = glm::vec3(j*m_cellsize, i*m_cellsize, 0);
-			glm::vec3 c = glm::vec3 (1, 1, 1);
-			m_colors.push_back(c);
-			glm::vec2 t = glm::vec2(v.x/m_width, v.y/m_height);
-			m_texcoords.push_back(t);
-			m_vertices.push_back(v);
-
+			glm::vec3 v;
+			if(m_Heightmap != NULL)
+			{
+				float percent = m_Heightmap->getColorAt(x, y);
+				//float percent = 0;
+				v  = glm::vec3(j*m_cs, m_elevation * percent, i*m_cs);
+				x++; 
+				
+				cout<<"x " <<x; 
+				cout<<" y "<<y<<endl;
+			}
+			else{
+				v  = glm::vec3(j*m_cs, 0 , i*m_cs);
+			}
+			glm::vec2 t = 4.f * glm::vec2(v.x/mW, v.z/mH);
+			verts.push_back(v);
+			tcoords.push_back(t);
 		}
+		y++;
 	}
 
 	//create indices for the NewGrid
@@ -54,107 +111,110 @@ void NewGrid::initGrid()
 			int v7 = (i+1)+((j+1)*nopx);
 
 			
-			m_indices.push_back(v1);
- 			m_indices.push_back(v6);
-			m_indices.push_back(v2);
+			indices.push_back(v1);
+ 			indices.push_back(v6);
+			indices.push_back(v2);
 
-			m_indices.push_back(v2);
-			m_indices.push_back(v6);
-			m_indices.push_back(v7);
+			indices.push_back(v2);
+			indices.push_back(v6);
+			indices.push_back(v7);
 
 		}
 	}
-
 	
-
 	//initialize m_normals
-/*	for(int i = 0 ; i < m_vertices.size();i++)
+	for(int i = 0 ; i < verts.size();i++)
 	{
-		m_normals.push_back(glm::vec3(0,0,0));
+		normals.push_back(glm::vec3(0,0,0));
 	}
-
-	for(int i = 0; i < m_indices.size();i+=3)
+	//This works for row wise grids 
+	//Make sure the grid is row wise else the normals are going to be incorrect. 
+	for(int i = 0; i < indices.size();i+=3)
 	{
-		unsigned int idx1 = m_indices[i];
-		unsigned int idx2 = m_indices[i+1];
-		unsigned int idx3 = m_indices[i+2];
+		unsigned int idx1 = indices[i];
+		unsigned int idx2 = indices[i+1];
+		unsigned int idx3 = indices[i+2];
 
-		glm::vec3 A = m_vertices[idx1];
-		glm::vec3 B = m_vertices[idx2];
-		glm::vec3 C = m_vertices[idx3];
+		glm::vec3 A = verts[idx1];
+		glm::vec3 B = verts[idx2];
+		glm::vec3 C = verts[idx3];
 
 		glm::vec3 AB = B-A; 
 		glm::vec3 AC = C-A; 
 		glm::vec3 cross = glm::cross(AB, AC);
 
-		m_normals[idx1] += cross;
-		m_normals[idx2] += cross;
-		m_normals[idx3] += cross;
+		normals[idx1] += cross;
+		normals[idx2] += cross;
+		normals[idx3] += cross;
 
 	}
 
-	for(int i = 0 ; i < m_vertices.size();i++)
+	for(int i = 0 ; i < verts.size();i++)
 	{
-		m_normals[i] = glm::normalize(m_normals[i]);
-	}*/
+		normals[i] = glm::normalize(normals[i]);
+	}
+
+
+	for(int i = 0 ; i < verts.size(); i++)
+	{
+		ModelLoader::Vertex d; 
+		d.p = verts[i];
+		d.t = tcoords[i];
+		d.n = normals[i];
+		data.push_back(d);
+	}
+
+	m_vbo->init(data, indices);
+
 }
 
-void NewGrid::initBuffers()
+void NewGrid::setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s)
 {
-	//Generate buffers for NewGrid vertices
-	glGenBuffers(1, &m_vb);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vb);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size()*sizeof(glm::vec3), &m_vertices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//Generate Buffers for NewGrid Colors; 
-	glGenBuffers(1, &m_cb);
-	glBindBuffer(GL_ARRAY_BUFFER, m_cb);
-	glBufferData(GL_ARRAY_BUFFER, m_colors.size()*sizeof(glm::vec3), &m_colors[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//generate buffers for NewGrid indices
-	glGenBuffers(1, &m_ib);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size()*sizeof(unsigned short), &m_indices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	//Texcoords;
-	glGenBuffers(1, &m_tb);
-	glBindBuffer(GL_ARRAY_BUFFER, m_tb);
-	glBufferData(GL_ARRAY_BUFFER, m_texcoords.size()*sizeof(glm::vec2), &m_texcoords[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//generate buffers for NewGrid normals 
-	/*glGenBuffers(1, &m_nb);
-	glBindBuffer(GL_ARRAY_BUFFER, m_nb);
-	glBufferData(GL_ARRAY_BUFFER, m_normals.size()*sizeof(glm::vec3), &m_normals[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
+	m_material.Ka = a; 
+	m_material.Kd = d; 
+	m_material.Ks = s; 
 }
 
-void NewGrid::render(int pos, int color, int normal, int tex_loc, int sample)
+void NewGrid::render(Camera cam, TrackBall* tb, Light* light)
 {
-//	m_texture->activate(sample, GL_TEXTURE0, 0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glPolygonMode( GL_FRONT, GL_LINE );
-	glBindBuffer(GL_ARRAY_BUFFER, m_vb);
-	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//Light Position
+	Light::LightProperties lprops = light->properties();
+	glm::vec4 lp = glm::vec4(light->position(), 1.f);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_cb);
-	glVertexAttribPointer(color, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	m_shader->use();
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_tb);
-	glVertexAttribPointer(tex_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	//setup textures
+	mTex->activate(GL_TEXTURE0);
+	m_shader->setSampler("TextureSample2D", 0);
 
-	/*glBindBuffer(GL_ARRAY_BUFFER, m_nb);
-	glVertexAttribPointer(normal, 3, GL_FLOAT, GL_TRUE, 0, 0);*/
+	//Setting up Matrices
+	glm::mat4 m = cam.matrix() * tb->matrix() * m_model;
+	glm::mat4 normalMatrix = glm::transpose(cam.view() * tb->matrix() * m_model);
 
-	glFrontFace(GL_CW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
-	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_SHORT, (void*)0);
-	
+	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
+	m_shader->setUniform("ModelViewMatrix",  cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
+	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
+	m_shader->setUniform("NormalMatrix", normalMatrix);	
+
+	//Light Position
+	m_shader->setUniform("lightPosition", cam.view() * m_model * lp);
+
+	//Setup Material 
+	m_shader->setUniform("ka", m_material.Ka);
+	m_shader->setUniform("kd", m_material.Kd);
+	m_shader->setUniform("ks", m_material.Ks);
+
+	//Setup Lights
+	m_shader->setUniform("la", lprops.Ia);
+	m_shader->setUniform("ld", lprops.Id);
+	m_shader->setUniform("ls", lprops.Is);
+
+	m_vbo->render();
+
+	mTex->deactivate();
+	m_shader->disuse();	
 }
 
-NewGrid::~NewGrid(void)
-{
-}
+

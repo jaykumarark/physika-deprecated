@@ -20,7 +20,8 @@ public:
 	};
 
 
-	PObject(std::string modelFile, 
+	PObject(glm::vec3 p,
+			std::string modelFile, 
 			std::string textureFile, 
 			std::string vertexFile, 
 			std::string fragmentFile,

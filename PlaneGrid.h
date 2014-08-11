@@ -7,7 +7,6 @@
 #include "VertexBufferObject.h"
 #include "GLSLShader.h"
 #include <vector>
-#include "PlaneGrid.h"
 #include "Camera.h"
 #include "trackball.h"
 #include "Light.h"

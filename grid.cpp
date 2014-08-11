@@ -10,8 +10,7 @@ Grid::Grid(std::string filename)
 void Grid::init(std::string filename)
 {
 	//init height field
-	m_img = new Image(filename);
-	m_img->makeHeightMap();
+	m_img = new Image(filename, true);
 
 	//init grid
 	initGrid();

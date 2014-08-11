@@ -95,6 +95,12 @@
     <None Include="LightFS.glsl">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="terrainVS.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="terrainFS.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
