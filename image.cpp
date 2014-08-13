@@ -51,7 +51,9 @@ void Image::makeHeightMap()
 	{
 		for(int j = 0; j < mheight; j++)
 		{
-			mHeightMap[(j+(mheight*i))] = (float)mData[k]/255;
+			float val = (float)mData[k]/255;
+			val = std::max(0.f, std::min(val, 1.f));
+			mHeightMap[(j+(mheight*i))] = val;
 			k+=3;
 		}
 	}
@@ -59,5 +61,5 @@ void Image::makeHeightMap()
 
 float Image::getColorAt(int x, int y)
 {
-	return mHeightMap[(y+(mheight*x))];
+	return std::max(0.f, std::min(mHeightMap[(y+(mheight*x))], 1.f));
 }

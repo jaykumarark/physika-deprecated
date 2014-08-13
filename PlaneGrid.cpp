@@ -135,15 +135,16 @@ void PlaneGrid::render(Camera cam, TrackBall* tb, Light* light)
 
 	//Setting up Matrices
 	glm::mat4 m = cam.matrix() * tb->matrix() * m_model;
-	glm::mat4 normalMatrix = glm::transpose(cam.view() * tb->matrix() * m_model);
+	//glm::mat4 normalMatrix = glm::transpose(cam.view() * tb->matrix() * m_model);
+	glm::mat4 normalMatrix = glm::mat4(1);
 
 	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
 	m_shader->setUniform("ModelViewMatrix",  cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
-	m_shader->setUniform("NormalMatrix", normalMatrix);	
+	m_shader->setUniform("ViewMatrix", cam.view());	
 
 	//Light Position
-	m_shader->setUniform("lightPosition", cam.view() * m_model * lp);
+	m_shader->setUniform("lightPosition", lp);
 
 	//Setup Material 
 	m_shader->setUniform("ka", m_material.Ka);

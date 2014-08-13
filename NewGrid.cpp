@@ -82,8 +82,7 @@ void NewGrid::init()
 			{
 				int x = j + 64; 
 				int y = -(i - 64);
-				//cout<<"x "<<x<<" y "<<y<<endl;*/
-
+				
 				float percent = m_Heightmap->getColorAt(x, y);
 				//float percent = 0;
 
@@ -175,7 +174,7 @@ void NewGrid::setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s)
 
 void NewGrid::render(Camera cam, TrackBall* tb, Light* light)
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	//Light Position
 	Light::LightProperties lprops = light->properties();
@@ -194,10 +193,10 @@ void NewGrid::render(Camera cam, TrackBall* tb, Light* light)
 	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
 	m_shader->setUniform("ModelViewMatrix",  cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
-	m_shader->setUniform("NormalMatrix", normalMatrix);	
+	m_shader->setUniform("ViewMatrix", cam.view());	
 
 	//Light Position
-	m_shader->setUniform("lightPosition", cam.view() * m_model * lp);
+	m_shader->setUniform("lightPosition", lp);
 
 	//Setup Material 
 	m_shader->setUniform("ka", m_material.Ka);
