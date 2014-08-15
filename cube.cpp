@@ -1,16 +1,21 @@
 #include "cube.h"
 
 
-Cube::Cube(glm::vec3 d, glm::vec3 p)
+Cube::Cube(glm::vec3 d, glm::vec3 p, vector<string> cubemap)
 {
 	dim = d; 
 	pos = p; 
-	tex = new Texture(GL_TEXTURE_2D, "textures/blue.png",GL_REPEAT, GL_LINEAR, GL_LINEAR);
+	tex = new CubeMap(cubemap,GL_CLAMP_TO_EDGE, GL_LINEAR, GL_LINEAR);
 	computeVerts();
 	computeIndices();
 	computeTexCoords();
 	initColors();
 	initBuffers();
+}
+
+void Cube::init()
+{
+
 }
 
 void Cube::initBuffers()

@@ -52,7 +52,8 @@ void ModelLoader::InitMesh(const aiMesh* paiMesh)
 
 		Vertex v(glm::vec3(pPos->x, pPos->y, pPos->z),
 			glm::vec2(pTexCoord->x, pTexCoord->y),
-			glm::vec3(pNormal->x, pNormal->y, pNormal->z));
+			glm::vec3(pNormal->x, pNormal->y, pNormal->z), 
+			glm::vec3(0));
 		m_data.push_back(v);
 	}
 

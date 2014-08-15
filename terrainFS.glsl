@@ -36,7 +36,7 @@ void main()
 	vec3 r = reflect(-s, tnorm);
 	vec3 v = normalize(-eyeCoords.xyz);
 
-	float shininess = 1; 
+	float shininess = 0.1; 
 	vec3 spec = vec3(0);
 
 	float sdotn = max(dot(s, tnorm), 0.0);

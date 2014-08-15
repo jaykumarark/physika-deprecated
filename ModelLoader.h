@@ -15,14 +15,16 @@ public:
 		glm::vec3 p; 
 		glm::vec2 t; 
 		glm::vec3 n;
+		glm::vec3 c;
 
 		Vertex() {}
 
-		Vertex(const glm::vec3& pos, const glm::vec2& tex, const glm::vec3& normal)
+		Vertex(const glm::vec3& pos, const glm::vec2& tex, const glm::vec3& normal, const glm::vec3& color)
 		{
 			p    = pos;
 			t    = tex;
-			n = normal;
+			n	 = normal;
+			c	 = color;
 		}
 	};
 

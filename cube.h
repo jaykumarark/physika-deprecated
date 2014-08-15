@@ -4,12 +4,13 @@
 
 #include <glm\glm.hpp>
 #include <GL\glew.h>
-#include "texture.h"
+#include "CubeMap.h"
+
 
 class Cube
 {
 public:
-	Cube(glm::vec3 d, glm::vec3 p);
+	Cube(glm::vec3 d, glm::vec3 p, vector<string> cubemap);
 	void render(int pos_loc, int color_loc, int tex_loc, int sample);
 	~Cube(void);
 private:
@@ -18,6 +19,7 @@ private:
 	void computeTexCoords();
 	void initColors();
 	void initBuffers(); 
+	void init();
 
 	glm::vec3 pos; 
 	glm::vec3 dim;			//dimensions of cube x->width , y-> depth
@@ -31,7 +33,7 @@ private:
 	GLuint CB;			//Color Buffers
 	GLuint TB;			//Texture Coordinate Buffers
 
-	Texture* tex;
+	CubeMap* tex;
 
 };
 

@@ -34,11 +34,13 @@ void VertexBufferObject::render()
 	glEnableVertexAttribArray(VERTEX_POSITION);
 	glEnableVertexAttribArray(VERTEX_NORMAL);
 	glEnableVertexAttribArray(VERTEX_TEXTURE);
+	glEnableVertexAttribArray(VERTEX_COLOR);
 
 	glBindBuffer(m_target, m_vbId);
 	glVertexAttribPointer(VERTEX_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(ModelLoader::Vertex), 0);
 	glVertexAttribPointer(VERTEX_TEXTURE, 2, GL_FLOAT, GL_FALSE, sizeof(ModelLoader::Vertex), (const GLvoid*)12);
 	glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(ModelLoader::Vertex), (const GLvoid*)20);
+	glVertexAttribPointer(VERTEX_COLOR, 3, GL_FLOAT, GL_FALSE, sizeof(ModelLoader::Vertex), (const GLvoid*)32);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibId);
 
@@ -48,6 +50,7 @@ void VertexBufferObject::render()
 	glDisableVertexAttribArray(VERTEX_POSITION);
 	glDisableVertexAttribArray(VERTEX_NORMAL);
 	glDisableVertexAttribArray(VERTEX_TEXTURE);
+	glDisableVertexAttribArray(VERTEX_COLOR);
 }
 
 VertexBufferObject::~VertexBufferObject(void)

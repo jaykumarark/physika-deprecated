@@ -1,143 +1,179 @@
 #include "grid.h"
 
 
-Grid::Grid(std::string filename)
+Grid::Grid(glm::vec3 pos, 
+		   int cs,
+		   int elevation,
+		   std::string heightMapFile,
+		   std::string textureFile,
+		   std::string vertexFile, 
+		   std::string fragmentFile,
+		   glm::vec3 a, 
+		   glm::vec3 d,
+		   glm::vec3 s)
 {
-	init(filename);
+	m_pos = pos;
+	m_cs = cs;
+	m_elevation = elevation;
+	m_Heightmap = new Image(heightMapFile, true);
+	mW = m_Heightmap->width(); 
+	mH= m_Heightmap->height(); 
+	mTex = new Texture(GL_TEXTURE_2D, textureFile, GL_REPEAT, GL_LINEAR, GL_LINEAR);
+	m_vbo = new VertexBufferObject(GL_ARRAY_BUFFER, GL_TRIANGLES);
+	m_shader = new GLSLShader(vertexFile.c_str(), fragmentFile.c_str());
+	m_model = glm::translate(glm::mat4(1), pos);
+	setMaterial(a, d, s);
+	init();
+}
+
+Grid::~Grid(void)
+{
+	delete mTex; 
+	delete m_shader; 
+	delete m_vbo;
 }
 
 
-void Grid::init(std::string filename)
+void Grid::setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s)
 {
-	//init height field
-	m_img = new Image(filename, true);
-
-	//init grid
-	initGrid();
-
-	//init Buffers
-	initBuffers();
+	m_material.Ka = a; 
+	m_material.Kd = d; 
+	m_material.Ks = s; 
 }
 
-void Grid::initGrid()
+void Grid::init()
 {
-	int gridX = m_img->width(); 
-	int gridY = m_img->height();
-	int gSize = 20;
-	for(int j = 0; j < gridY; j++)
+	vector<glm::vec3> verts; 
+	vector<glm::vec2> tcoords;
+	vector<unsigned int> indices; 
+	vector<glm::vec3> normals;
+	vector<glm::vec3> colors; 
+	vector<ModelLoader::Vertex> data;
+
+	/*int gridX = m_Heightmap->width(); 
+	int gridY = m_Heightmap->height();
+	int gSize = 20;*/
+	for(int j = 0; j < mH; j++)
 	{
-		for(int i = 0; i < gridX; i++)
+		for(int i = 0; i < mW; i++)
 		{
-			glm::vec3 v  = glm::vec3(i*gSize, -500*m_img->getColorAt(i, j), -j*gSize);
-			glm::vec3 c = glm::vec3 ((float)i/128,  m_img->getColorAt(i, j), (float)j/128);
-			m_colors.push_back(c);
-			m_vertices.push_back(v);
-
+			glm::vec3 v  = glm::vec3(i*m_cs, -m_elevation*m_Heightmap->getColorAt(i, j), -j*m_cs);
+			glm::vec3 c = glm::vec3 ((float)i/255,  m_Heightmap->getColorAt(i, j), (float)j/128);
+			glm::vec2 t = 4.f * glm::vec2(v.x/mW, v.z/mH);
+			colors.push_back(c);
+			verts.push_back(v);
+			tcoords.push_back(t);
 		}
 	}
 
 	//create indices for the grid
-	for( int j = 0; j < gridY-1 ; j++)
+	for( int j = 0; j < mH-1 ; j++)
 	{
 
-		for( int i = 0; i < gridX-1; i++)
+		for( int i = 0; i < mW-1; i++)
 		{
-			int v1 = i + j*gridX;
-			int v2 = (i + 1) + j*gridX;
-			int v6 = i+ (j+1)*gridX;
-			int v7 = (i+1)+((j+1)*gridX);
+			int v1 = i + j*mW;
+			int v2 = (i + 1) + j*mW;
+			int v6 = i+ (j+1)*mW;
+			int v7 = (i+1)+((j+1)*mW);
 
 
-			m_indices.push_back(v1);
-			m_indices.push_back(v6);
-			m_indices.push_back(v2);
+			indices.push_back(v1);
+			indices.push_back(v6);
+			indices.push_back(v2);
 			
-			m_indices.push_back(v2);
-			m_indices.push_back(v6);
-			m_indices.push_back(v7);
+			indices.push_back(v2);
+			indices.push_back(v6);
+			indices.push_back(v7);
 			
 		}
 	}
 
 
 	//initialize m_normals
-	for(int i = 0 ; i < m_vertices.size();i++)
+	for(int i = 0 ; i < verts.size();i++)
 	{
-		m_normals.push_back(glm::vec3(0,0,0));
+		normals.push_back(glm::vec3(0,0,0));
 	}
 
 	//This works for row wise grids 
 	//Make sure the grid is row wise else the normals are going to be incorrect. 
-	for(int i = 0; i < m_indices.size();i+=3)
+	for(int i = 0; i < indices.size();i+=3)
 	{
-		unsigned int idx1 = m_indices[i];
-		unsigned int idx2 = m_indices[i+1];
-		unsigned int idx3 = m_indices[i+2];
+		unsigned int idx1 = indices[i];
+		unsigned int idx2 = indices[i+1];
+		unsigned int idx3 = indices[i+2];
 
-		glm::vec3 A = m_vertices[idx1];
-		glm::vec3 B = m_vertices[idx2];
-		glm::vec3 C = m_vertices[idx3];
+		glm::vec3 A = verts[idx1];
+		glm::vec3 B = verts[idx2];
+		glm::vec3 C = verts[idx3];
 
 		glm::vec3 AB = B-A; 
 		glm::vec3 AC = C-A; 
-		glm::vec3 cross = glm::cross(AB, AC);
+		glm::vec3 cross = glm::cross(AC, AB);
 
-		m_normals[idx1] += cross;
-		m_normals[idx2] += cross;
-		m_normals[idx3] += cross;
+		normals[idx1] += cross;
+		normals[idx2] += cross;
+		normals[idx3] += cross;
 
 	}
 
-	for(int i = 0 ; i < m_vertices.size();i++)
+	for(int i = 0 ; i < verts.size();i++)
 	{
-		m_normals[i] = glm::normalize(m_normals[i]);
+		normals[i] = glm::normalize(normals[i]);
 	}
+
+	for(int i = 0 ; i < verts.size(); i++)
+	{
+		ModelLoader::Vertex d; 
+		d.p = verts[i];
+		d.t = tcoords[i];
+		d.n = normals[i];
+		d.c = colors[i];
+		data.push_back(d);
+	}
+
+	m_vbo->init(data, indices);
 }
 
-void Grid::initBuffers()
+
+void Grid::render(Camera cam, TrackBall* tb, Light* light)
 {
-	//Generate buffers for grid vertices
-	glGenBuffers(1, &m_vb);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vb);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size()*sizeof(glm::vec3), &m_vertices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//Light Position
+	Light::LightProperties lprops = light->properties();
+	glm::vec4 lp = glm::vec4(light->position(), 1.f);
 
-	//Generate Buffers for grid Colors; 
-	glGenBuffers(1, &m_cb);
-	glBindBuffer(GL_ARRAY_BUFFER, m_cb);
-	glBufferData(GL_ARRAY_BUFFER, m_colors.size()*sizeof(glm::vec3), &m_colors[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	m_shader->use();
 
-	//generate buffers for grid indices
-	glGenBuffers(1, &m_ib);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size()*sizeof(unsigned short), &m_indices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//setup textures
+	mTex->activate(GL_TEXTURE0);
+	m_shader->setSampler("TextureSample2D", 0);
 
-	//generate buffers for grid normals 
-	glGenBuffers(1, &m_nb);
-	glBindBuffer(GL_ARRAY_BUFFER, m_nb);
-	glBufferData(GL_ARRAY_BUFFER, m_normals.size()*sizeof(glm::vec3), &m_normals[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//Setting up Matrices
+	glm::mat4 m = cam.matrix() * tb->matrix() * m_model;
+	//glm::mat4 normalMatrix = glm::transpose(cam.view() * tb->matrix() * m_model);
+
+	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
+	m_shader->setUniform("ModelViewMatrix",  cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
+	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
+	m_shader->setUniform("ViewMatrix", cam.view());	
+
+	//Light Position
+	m_shader->setUniform("lightPosition", lp);
+
+	//Setup Material 
+	m_shader->setUniform("ka", m_material.Ka);
+	m_shader->setUniform("kd", m_material.Kd);
+	m_shader->setUniform("ks", m_material.Ks);
+
+	//Setup Lights
+	m_shader->setUniform("la", lprops.Ia);
+	m_shader->setUniform("ld", lprops.Id);
+	m_shader->setUniform("ls", lprops.Is);
+
+	m_vbo->render();
+
+	mTex->deactivate();
+	m_shader->disuse();	
 }
 
-void Grid::render(int pos, int color, int normal)
-{
-	glPolygonMode( GL_BACK, GL_LINE );
-	glBindBuffer(GL_ARRAY_BUFFER, m_vb);
-	glVertexAttribPointer(pos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, m_cb);
-	glVertexAttribPointer(color, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_nb);
-	glVertexAttribPointer(normal, 3, GL_FLOAT, GL_TRUE, 0, 0);
-	
-	glFrontFace(GL_CW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
-	glDrawElements(GL_TRIANGLES,m_indices.size(), GL_UNSIGNED_SHORT, (void*)0);
-}
-
-Grid::~Grid(void)
-{
-}

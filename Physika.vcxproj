@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="cube.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="GLSLShader.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="image.cpp" />
@@ -110,6 +111,8 @@
     <None Include="gridVS.glsl" />
     <None Include="LightFS.glsl" />
     <None Include="LightVS.glsl" />
+    <None Include="skyboxFrag.glsl" />
+    <None Include="skyboxVert.glsl" />
     <None Include="terrainFS.glsl" />
     <None Include="terrainVS.glsl" />
     <None Include="vs.glsl" />
@@ -117,6 +120,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="cube.h" />
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="GLSLShader.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="image.h" />

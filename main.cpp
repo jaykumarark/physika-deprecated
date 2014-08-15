@@ -13,7 +13,8 @@
 #include "PObject.h"`
 #include "TreeSystem.h"
 #include "Light.h"
-#include "NewGrid.h"
+#include "Grid.h"
+#include "cube.h"
 #include <time.h>
 
 int gwidth = 1024;
@@ -25,7 +26,11 @@ PlaneGrid* plane;
 PObject* teapot;
 Light* sceneLight; 
 TreeSystem* fractal; 
-NewGrid* terrain;
+Grid* terrain;
+Cube* skybox;
+
+//CubeMap
+vector<string> cubemap;
 
  
 //Keyboard variables
@@ -38,16 +43,26 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(1.f, 3000.f);
-	cam.setPosition(glm::vec3(0, 20, 20));
+	cam.setPosition(glm::vec3(0, 0, 20));
 	cam.lookAt(glm::vec3(0, 0, 0.0));
-	cam.setVelocity(2);
+	cam.setVelocity(20);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
+}
+void initCubeMap()
+{
+	cubemap.push_back("posx.jpg");
+	cubemap.push_back("negx.jpg");
+	cubemap.push_back("posy.jpg");
+	cubemap.push_back("negy.jpg");
+	cubemap.push_back("posz.jpg");
+	cubemap.push_back("negz.jpg");
 }
 
 void initOpengl()
 {
 	glEnable(GL_DEPTH_TEST);
 	initCamera();
+	initCubeMap();
 	trackBall			= new TrackBall(gwidth, gheight);
 	plane				= new PlaneGrid(glm::vec3(0,0,0), 
 										128, 128, 
@@ -58,29 +73,30 @@ void initOpengl()
 										"gridVS.glsl", 
 										"gridFS.glsl");
 
-	/*terrain					= new NewGrid(glm::vec3(0,0,0), 
+	terrain					= new Grid(glm::vec3(-128,0,128), 
 										 2, 
 										 50.f, 
-										"textures/grass.jpg",
 										"textures/perlin2.jpg",
+										"textures/grass.jpg",
 										"terrainVS.glsl", 
 										"terrainFS.glsl", 
 										glm::vec3(1), 
 										glm::vec3(1), 
-										glm::vec3(0.0));*/
+										glm::vec3(0));
 
-	teapot				= new PObject(glm::vec3(0,0,0),"models/gargoyle.obj",
+	/*teapot				= new PObject(glm::vec3(0,0,0),"models/gargoyle.obj",
 									  "textures/grass.jpg",
 									  "diffuseVS.glsl",
 									  "diffuseFS.glsl",
 									  glm::vec3(1), 
 									  glm::vec3(0.7), 
-									  glm::vec3(1));
+									  glm::vec3(1));*/
 
-	sceneLight			= new Light(glm::vec3(0, 20, 20), 
+	sceneLight			= new Light(glm::vec3(0, 20, 100), 
 									glm::vec3(0.2, 0.2, 0.2), 
 									glm::vec3(0.7),
 									glm::vec3(1));
+	skybox				= new Cube(glm::vec3(10), glm::vec3(0), cubemap);
 	fractal				= new TreeSystem();
 	fractal->writeRules();
 }
@@ -91,9 +107,9 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	teapot->render(cam, trackBall, sceneLight); 
-	plane->render(cam, trackBall, sceneLight);
-	//terrain->render(cam, trackBall, sceneLight);
+	//teapot->render(cam, trackBall, sceneLight); 
+	//plane->render(cam, trackBall, sceneLight);
+	terrain->render(cam, trackBall, sceneLight);
 	sceneLight->render(cam, trackBall);
 	glutPostRedisplay();
 	glutSwapBuffers();

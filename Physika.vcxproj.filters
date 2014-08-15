@@ -69,6 +69,9 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fs.glsl">
@@ -99,6 +102,12 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="terrainFS.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="skyboxVert.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="skyboxFrag.glsl">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
@@ -152,6 +161,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
