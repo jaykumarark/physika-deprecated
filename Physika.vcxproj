@@ -86,7 +86,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="cube.cpp" />
-    <ClCompile Include="CubeMap.cpp" />
+    <None Include="CubeMap.cpp" />
     <ClCompile Include="GLSLShader.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="image.cpp" />
@@ -120,7 +120,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="cube.h" />
-    <ClInclude Include="CubeMap.h" />
+    <None Include="CubeMap.h" />
     <ClInclude Include="GLSLShader.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="image.h" />

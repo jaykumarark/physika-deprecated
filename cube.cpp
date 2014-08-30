@@ -5,7 +5,7 @@ Cube::Cube(glm::vec3 d, glm::vec3 p, vector<string> cubemap)
 {
 	dim = d; 
 	pos = p; 
-	tex = new CubeMap(cubemap,GL_CLAMP_TO_EDGE, GL_LINEAR, GL_LINEAR);
+	//tex = new CubeMap(cubemap,GL_CLAMP_TO_EDGE, GL_LINEAR, GL_LINEAR);
 	computeVerts();
 	computeIndices();
 	computeTexCoords();

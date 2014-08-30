@@ -84,13 +84,13 @@ void initOpengl()
 										glm::vec3(1), 
 										glm::vec3(0));
 
-	/*teapot				= new PObject(glm::vec3(0,0,0),"models/gargoyle.obj",
+	teapot				= new PObject(glm::vec3(0,0,0),"models/gargoyle.obj",
 									  "textures/grass.jpg",
 									  "diffuseVS.glsl",
 									  "diffuseFS.glsl",
 									  glm::vec3(1), 
 									  glm::vec3(0.7), 
-									  glm::vec3(1));*/
+									  glm::vec3(1));
 
 	sceneLight			= new Light(glm::vec3(0, 20, 100), 
 									glm::vec3(0.2, 0.2, 0.2), 
@@ -107,9 +107,9 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//teapot->render(cam, trackBall, sceneLight); 
-	//plane->render(cam, trackBall, sceneLight);
-	terrain->render(cam, trackBall, sceneLight);
+	teapot->render(cam, trackBall, sceneLight); 
+	plane->render(cam, trackBall, sceneLight);
+	//terrain->render(cam, trackBall, sceneLight);
 	sceneLight->render(cam, trackBall);
 	glutPostRedisplay();
 	glutSwapBuffers();

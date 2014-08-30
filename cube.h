@@ -33,7 +33,7 @@ private:
 	GLuint CB;			//Color Buffers
 	GLuint TB;			//Texture Coordinate Buffers
 
-	CubeMap* tex;
+	//CubeMap* tex;
 
 };
 

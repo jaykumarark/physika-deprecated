@@ -41,7 +41,7 @@ void PObject::init()
 {
 	m_vbo->init(m_objLoader->data(), m_objLoader->indices());
 	m_shader = new GLSLShader(m_vertexFile.c_str(), m_fragmentFile.c_str());
-	m_model = glm::scale(m_model,glm::vec3(1, 1, 1));
+	m_model = glm::scale(m_model,glm::vec3(0.2, 0.2, .2));
 	
 }
 
