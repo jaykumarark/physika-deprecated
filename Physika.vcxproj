@@ -39,8 +39,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libraries\assimp\include;$(SolutionDir)\libraries\GLM;$(SolutionDir)\libraries\GLEW\include;$(SolutionDir)\libraries\freeglut\include;$(SolutionDir)\libraries\soil\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libraries\assimp\lib\x86;$(SolutionDir)\libraries\GLEW\lib;$(SolutionDir)\libraries\freeglut\lib;$(SolutionDir)\libraries\soil\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libraries\assimp\include;$(SolutionDir)\libraries\GLM;$(SolutionDir)\libraries\GLEW\include;$(SolutionDir)\libraries\freeglut\include;$(SolutionDir)\libraries\soil\include;$(SolutionDir)\libraries\fmod\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libraries\assimp\lib\x86;$(SolutionDir)\libraries\GLEW\lib;$(SolutionDir)\libraries\freeglut\lib;$(SolutionDir)\libraries\soil\lib;$(SolutionDir)\libraries\fmod\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -58,7 +58,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;fmodex_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -85,8 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="cube.cpp" />
-    <None Include="CubeMap.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="GLSLShader.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="image.cpp" />
@@ -95,9 +94,11 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="NewGrid.cpp" />
     <ClCompile Include="ObjectSlab.cpp" />
+    <ClCompile Include="PAudio.cpp" />
     <ClCompile Include="PickingRay.cpp" />
     <ClCompile Include="PlaneGrid.cpp" />
     <ClCompile Include="PObject.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="trackball.cpp" />
     <ClCompile Include="TreeSystem.cpp" />
@@ -111,6 +112,8 @@
     <None Include="gridVS.glsl" />
     <None Include="LightFS.glsl" />
     <None Include="LightVS.glsl" />
+    <None Include="skyboxFS.glsl" />
+    <None Include="skyboxVS.glsl" />
     <None Include="skyboxFrag.glsl" />
     <None Include="skyboxVert.glsl" />
     <None Include="terrainFS.glsl" />
@@ -119,7 +122,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="cube.h" />
     <None Include="CubeMap.h" />
     <ClInclude Include="GLSLShader.h" />
     <ClInclude Include="grid.h" />
@@ -128,9 +130,11 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="NewGrid.h" />
     <ClInclude Include="ObjectSlab.h" />
+    <ClInclude Include="PAudio.h" />
     <ClInclude Include="PickingRay.h" />
     <ClInclude Include="PlaneGrid.h" />
     <ClInclude Include="PObject.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="trackball.h" />
     <ClInclude Include="TreeSystem.h" />

@@ -17,7 +17,7 @@ bool ModelLoader::LoadMesh(const std::string filename)
 	bool Ret = false; 
 	Assimp::Importer Importer; 
 
-	const aiScene* pScene = Importer.ReadFile(filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+	const aiScene* pScene = Importer.ReadFile(filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs |aiProcess_FlipWindingOrder);
 
 	if(pScene)
 	{

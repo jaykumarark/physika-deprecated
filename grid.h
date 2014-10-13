@@ -39,7 +39,6 @@ public:
 	~Grid(void);
 	void init();
 	void initGrid();
-	void initBuffers();
 	void setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3  s);
 	void render(Camera cam, TrackBall* tb, Light* light);
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef CUBEMAP_H
+#define CUBEMAP_H
 #include <iostream>
 #include <GL\glew.h>
 #include <vector>
@@ -29,6 +29,8 @@ private:
 	GLint m_wrap; 
 	GLfloat m_magFilter; 
 	GLfloat m_minFilter;
+	Image* mImage;
+	vector<string> mFiles;
 
 };
 

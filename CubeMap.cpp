@@ -6,6 +6,7 @@ CubeMap::CubeMap(vector<string> filename, GLint wrap, GLfloat minFilter, GLfloat
 	m_wrap = wrap;
 	m_minFilter = minFilter;
 	m_magFilter = magFilter;
+	mFiles = filename;
 	init();
 }
 
@@ -28,7 +29,14 @@ void CubeMap::init()
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 
 	};
 
-	glTexImage2D   (targets[0], 0, GL_RGB, mImage->width(), mImage->height(), 0, GL_RGB, GL_UNSIGNED_BYTE, mImage->data());
+
+	for(int i = 0; i < mFiles.size(); i++)
+	{
+		mImage = new Image(mFiles[i], false);
+		glTexImage2D   (targets[i], 0, GL_RGB, mImage->width(), mImage->height(), 0, GL_RGB, GL_UNSIGNED_BYTE, mImage->data());
+		delete mImage;
+	}
+	
 
 	//Texture Settings
 	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, m_minFilter);

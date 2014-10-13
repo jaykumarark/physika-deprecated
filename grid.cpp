@@ -143,6 +143,7 @@ void Grid::render(Camera cam, TrackBall* tb, Light* light)
 	Light::LightProperties lprops = light->properties();
 	glm::vec4 lp = glm::vec4(light->position(), 1.f);
 
+
 	m_shader->use();
 
 	//setup textures

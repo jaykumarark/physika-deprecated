@@ -14,8 +14,9 @@
 #include "TreeSystem.h"
 #include "Light.h"
 #include "Grid.h"
-#include "cube.h"
+#include "Skybox.h"
 #include <time.h>
+#include "PAudio.h"
 
 int gwidth = 1024;
 int gheight = 768;
@@ -27,7 +28,8 @@ PObject* teapot;
 Light* sceneLight; 
 TreeSystem* fractal; 
 Grid* terrain;
-Cube* skybox;
+Skybox* sky;
+PAudio* audio;
 
 //CubeMap
 vector<string> cubemap;
@@ -50,12 +52,13 @@ void initCamera(){
 }
 void initCubeMap()
 {
-	cubemap.push_back("posx.jpg");
-	cubemap.push_back("negx.jpg");
-	cubemap.push_back("posy.jpg");
-	cubemap.push_back("negy.jpg");
-	cubemap.push_back("posz.jpg");
-	cubemap.push_back("negz.jpg");
+	cubemap.push_back("textures/spacebox/posx.jpg");
+	cubemap.push_back("textures/spacebox/negx.jpg");
+	cubemap.push_back("textures/spacebox/posy.jpg");
+	cubemap.push_back("textures/spacebox/negy.jpg");
+	cubemap.push_back("textures/spacebox/posz.jpg");
+	cubemap.push_back("textures/spacebox/negz.jpg");
+	sky = new Skybox(glm::vec3(0,0,0), "models/box.obj",cubemap,"skyboxVS.glsl", "skyboxFS.glsl");
 }
 
 void initOpengl()
@@ -72,7 +75,7 @@ void initOpengl()
 										"textures/floor.png",
 										"gridVS.glsl", 
 										"gridFS.glsl");
-
+		
 	terrain					= new Grid(glm::vec3(-128,0,128), 
 										 2, 
 										 50.f, 
@@ -84,21 +87,22 @@ void initOpengl()
 										glm::vec3(1), 
 										glm::vec3(0));
 
-	teapot				= new PObject(glm::vec3(0,0,0),"models/gargoyle.obj",
-									  "textures/grass.jpg",
-									  "diffuseVS.glsl",
-									  "diffuseFS.glsl",
-									  glm::vec3(1), 
-									  glm::vec3(0.7), 
-									  glm::vec3(1));
+	//teapot				= new PObject(glm::vec3(0,30,0),"models/gargoyle.obj",
+	//								  "textures/grass.jpg",
+	//								  "diffuseVS.glsl",
+	//								  "diffuseFS.glsl",
+	//								  glm::vec3(1), 
+	//								  glm::vec3(0.7), 
+	//								  glm::vec3(1));
 
 	sceneLight			= new Light(glm::vec3(0, 20, 100), 
 									glm::vec3(0.2, 0.2, 0.2), 
 									glm::vec3(0.7),
 									glm::vec3(1));
-	skybox				= new Cube(glm::vec3(10), glm::vec3(0), cubemap);
 	fractal				= new TreeSystem();
 	fractal->writeRules();
+	//audio				= new PAudio("iphone_metrognome_remix.mp3");
+	//audio->play();
 }
 
 
@@ -107,10 +111,37 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	teapot->render(cam, trackBall, sceneLight); 
-	plane->render(cam, trackBall, sceneLight);
-	//terrain->render(cam, trackBall, sceneLight);
+	//teapot->render(cam, trackBall, sceneLight); 
+	//plane->render(cam, trackBall, sceneLight);
+	terrain->render(cam, trackBall, sceneLight);
 	sceneLight->render(cam, trackBall);
+	//sky->render(cam);
+
+	/*glColor3f(1.f, 0.f, 0.f);
+	glPointSize(5.0);
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(glm::value_ptr(cam.projection()));
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(glm::value_ptr(cam.view()));
+
+	float *spec = audio->spectrum();
+	glBegin(GL_POINTS);
+	for(int i = 3 ; i < 63 ; i+=2 )
+	{
+	glVertex3f(i, spec[i] * 100 , 0);
+	glVertex3f((i+1), spec[i] * 75 , 0);
+	}
+	glEnd();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();*/
+
+
 	glutPostRedisplay();
 	glutSwapBuffers();
 }
@@ -206,6 +237,14 @@ void processKeyboard(float dt)
 	{
 		cam.offsetPosition(cam.velocity()*dt*cam.right());
 	}
+	if(keyStates['v'] || keyStates['V'])
+	{
+		float *spec = audio->spectrum();
+		for(int i = 0 ; i < 64 ; i++)
+		{
+			cout<<i<<": "<<spec[i]<<endl;
+		}
+	}
 	
 }
 
@@ -218,6 +257,7 @@ void idle()
 		//triangle->idle();
 	}
 	sceneLight->update();
+	//audio->update();
 }
 
 void createGlutCallBacks()
@@ -241,7 +281,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ACCUM);
 	glutInitWindowSize(gwidth,gheight);
 	glutInitWindowPosition(100, 30);
-	glutCreateWindow("Physika - Terrain Generator");
+	glutCreateWindow("Physika");
 	createGlutCallBacks();
 	GLenum res = glewInit();
 	if(res != GLEW_OK)
