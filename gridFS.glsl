@@ -38,7 +38,7 @@ void main()
 	
 	
 	//Surface normal vector
-	vec3 tnorm = vec3(NormalMatrix * fVertexNormal);
+	vec3 tnorm = normalize(vec3(NormalMatrix * fVertexNormal));
 
 	//Reflect vector
 	vec3 r = reflect(-lightVector, tnorm);

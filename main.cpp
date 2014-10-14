@@ -77,22 +77,22 @@ void initOpengl()
 	//									glm::vec3(1), 
 	//									glm::vec3(1));
 
-	sphere				= new Sphere(glm::vec3(0,20,0),20, 20, 10, "vs.glsl", 
+	sphere				= new Sphere(glm::vec3(-20,15,0),20, 20, 4, "vs.glsl", 
 												"fs.glsl",
 												glm::vec3(1), 
 												glm::vec3(1), 
 												glm::vec3(1.0));
 
-	teapot				= new PObject(glm::vec3(0,0,0),"models/Lucy.obj",
+	teapot				= new PObject(glm::vec3(0,10,0),"models/Lucy.obj",
 									  "textures/grass.jpg",
 									  "diffuseVS.glsl",
 									  "diffuseFS.glsl",
 									  glm::vec3(1), 
-									  glm::vec3(0.1), 
+									  glm::vec3(0.4,1.f,0.6), 
 									  glm::vec3(0.5));
 
 	sceneLight			= new Light(20,
-									glm::vec3(0, 10, 0), 
+									glm::vec3(0, 40, 0), 
 									glm::vec3(0.2, 0.2, 0.2), 
 									glm::vec3(0.7),
 									glm::vec3(1));
@@ -111,7 +111,7 @@ void display()
 	//terrain->render(cam, trackBall, sceneLight);
 	sceneLight->render(cam, trackBall);
 
-	//sphere->render(cam, sceneLight);
+	sphere->render(cam, sceneLight);
 	//sky->render(cam);
 
 	/*glColor3f(1.f, 0.f, 0.f);

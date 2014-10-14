@@ -38,13 +38,13 @@ void main()
 	
 	
 	//Surface normal vector
-	vec3 tnorm = vec3(NormalMatrix * fVertexNormal);
+	vec3 tnorm = normalize(vec3(NormalMatrix * fVertexNormal));
 
 	//Reflect vector
 	vec3 r = reflect(-lightVector, tnorm);
 	vec3 v = normalize(EyePositionInWorld-VertexEyeCoords.xyz);
 
-	float shininess = 10; 
+	float shininess = 50; 
 	vec3 spec = vec3(0);
 
 	float sdotn = max(dot(lightVector, tnorm), 0.0);

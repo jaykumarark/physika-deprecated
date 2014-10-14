@@ -38,10 +38,11 @@ void main()
 	
 	
 	//Surface normal vector
-	vec3 tnorm = vec3(ModelViewMatrix * vec4(fVertexNormal,0));
+	vec3 tnorm = normalize(vec3(NormalMatrix * fVertexNormal));
 
 	//Reflect vector
 	vec3 r = reflect(-lightVector, tnorm);
+	//view vector
 	vec3 v = normalize(EyePositionInWorld-VertexEyeCoords.xyz);
 
 	float shininess = 50; 
@@ -58,5 +59,5 @@ void main()
 	
 	vec4 texColor = texture(TextureSample2D, fVertexTexture);
 
-	outputColor = vec4(ambientTerm+diffuseTerm, 1.f);
+	outputColor = vec4(ambientTerm+diffuseTerm+spec, 1.f);
 }
