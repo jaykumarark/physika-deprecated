@@ -14,6 +14,11 @@ void VertexBufferObject::init(const std::vector<ModelLoader::Vertex> verts, cons
 	createVBO();
 }
 
+std::vector<ModelLoader::Vertex> VertexBufferObject::data()
+{
+	return m_verts;
+}
+
 void VertexBufferObject::createVBO()
 {
 

@@ -9,8 +9,10 @@ in vec3 fVertexPosition;
 //Uniforms
 uniform mat4 ModelViewMatrix;
 uniform mat4 ViewMatrix;
+uniform mat3 NormalMatrix;
 
 uniform vec4 lightPosition;
+uniform vec3 EyePositionInWorld;
 
 uniform vec3 ka; 
 uniform vec3 la; 
@@ -29,17 +31,23 @@ out vec4 outputColor;
 
 void main()
 {		
-	vec3 tnorm = vec3(ModelViewMatrix * vec4(fVertexNormal, 0));
-	vec4 eyeCoords = ModelViewMatrix * vec4(fVertexPosition, 1.0); 
+	
+	vec4 VertexEyeCoords = ModelViewMatrix * vec4(fVertexPosition, 1.0); 
 	vec4 lightEye = ViewMatrix * lightPosition;
-	vec3 s = normalize(vec3(lightEye - eyeCoords));
-	vec3 r = reflect(-s, tnorm);
-	vec3 v = normalize(-eyeCoords.xyz);
+	vec3 lightVector = normalize(vec3(lightEye - VertexEyeCoords));
+	
+	
+	//Surface normal vector
+	vec3 tnorm = vec3(NormalMatrix * fVertexNormal);
 
-	float shininess = 1; 
+	//Reflect vector
+	vec3 r = reflect(-lightVector, tnorm);
+	vec3 v = normalize(EyePositionInWorld-VertexEyeCoords.xyz);
+
+	float shininess = 10; 
 	vec3 spec = vec3(0);
 
-	float sdotn = max(dot(s, tnorm), 0.0);
+	float sdotn = max(dot(lightVector, tnorm), 0.0);
 
 	vec3 diffuseTerm = ld * kd * sdotn; 
 
@@ -50,5 +58,5 @@ void main()
 	
 	vec4 texColor = texture(TextureSample2D, fVertexTexture);
 
-	outputColor = vec4(diffuseTerm+ambientTerm, 1.f) * texColor + vec4(spec, 1.f);
+	outputColor = vec4(ambientTerm+diffuseTerm+spec, 1.f);
 }

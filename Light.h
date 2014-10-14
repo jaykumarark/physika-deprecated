@@ -17,7 +17,7 @@ public:
 	};
 
 
-	Light(glm::vec3 p, glm::vec3 a, glm::vec3 d, glm::vec3 s);
+	Light(float radius, glm::vec3 c, glm::vec3 a, glm::vec3 d, glm::vec3 s);
 	~Light(void);
 	void init(); 
 	void render(Camera cam, TrackBall* tb);
@@ -32,9 +32,11 @@ private:
 	GLSLShader* m_shader; 
 	ModelLoader* m_objLoader; 
 	glm::vec3 m_pos; 
+	glm::vec3 m_Center;
 	glm::mat4 m_model;
 	LightProperties m_props; 
 	float m_angle;
+	float mR;
 
 };
 

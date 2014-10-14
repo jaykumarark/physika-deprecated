@@ -17,6 +17,7 @@ PObject::PObject(glm::vec3 p,
 	m_vertexFile = vertexFile;
 	m_fragmentFile = fragmentFile;
 	m_model = glm::translate(glm::mat4(1.0), p);
+	m_model = glm::scale(m_model,glm::vec3(50,50,50));
 	init();
 	setMaterial(a, d, s);
 
@@ -47,10 +48,9 @@ void PObject::init()
 
 void PObject::render(Camera cam, TrackBall* tb, Light* light)
 {
-	Light::LightProperties lprops = light->properties();
-
 	//Light Position
 	glm::vec4 lp = glm::vec4(light->position(), 1.f); 
+	Light::LightProperties lprops = light->properties();
 
 	m_shader->use();
 
@@ -58,13 +58,18 @@ void PObject::render(Camera cam, TrackBall* tb, Light* light)
 	m_tex->activate(GL_TEXTURE0);
 	m_shader->setSampler("TextureSample2D",0);
 
-	glm::mat4 m = cam.matrix() * m_model;
-	glm::mat4 normalMatrix = glm::mat4(1);
-
 	//Setting up Matrices
+	glm::mat4 m = cam.matrix() * m_model;
+	glm::mat3 NormalMatrix = glm::mat3(cam.view()*m_model);
+	NormalMatrix = glm::transpose(glm::inverse(NormalMatrix));
+
+
 	m_shader->setUniform("ModelViewMatrix", cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
 	m_shader->setUniform("ViewMatrix", cam.view());				//uniform mat4 NormalMatrix;
+	m_shader->setUniform("NormalMatrix", NormalMatrix);
+
+	m_shader->setUniform("EyePositionInWorld", cam.position());
 
 	//Light Position
 	m_shader->setUniform("lightPosition", lp);
@@ -83,4 +88,36 @@ void PObject::render(Camera cam, TrackBall* tb, Light* light)
 
 	m_tex->deactivate();
 	m_shader->disuse();
+
+	/*glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(glm::value_ptr(cam.projection()));
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(glm::value_ptr(cam.view()*m_model));
+
+	std::vector<ModelLoader::Vertex> data = m_vbo->data();
+	glColor3f(1,0,0);
+	glPointSize(3.0);
+
+	glBegin(GL_POINTS);
+	for(int i = 0 ; i < data.size(); i++ )
+	{
+	glVertex3f(data[i].p.x,data[i].p.y,data[i].p.z);
+	}
+	glEnd();
+	glColor3f(0,0.8,1);
+	glBegin(GL_LINES);
+	for(int i = 0 ; i < data.size(); i++ )
+	{
+	glVertex3f(data[i].p.x,data[i].p.y,data[i].p.z);
+	glm::vec3 p2 = data[i].p+0.3f*data[i].n;
+	glVertex3f(p2.x,p2.y,p2.z);
+	}
+	glEnd();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();*/
 }

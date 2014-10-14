@@ -9,11 +9,7 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Source Files\Shaders">
+    <Filter Include="Shaders">
       <UniqueIdentifier>{54c5eae4-6ec0-465e-9495-ee1abf6f8bac}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -34,9 +30,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="grid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NewGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlaneGrid.cpp">
@@ -75,52 +68,55 @@
     <ClCompile Include="CubeMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fs.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="vs.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="gridVS.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="gridFS.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="diffuseFS.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="diffuseVS.glsl">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="LightVS.glsl">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="LightFS.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="terrainVS.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="terrainFS.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="skyboxVert.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="skyboxFrag.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="CubeMap.h">
       <Filter>Header Files</Filter>
     </None>
     <None Include="skyboxFS.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="skyboxVS.glsl">
-      <Filter>Source Files\Shaders</Filter>
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="LightFS.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="LightVS.glsl">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -140,9 +136,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="grid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NewGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlaneGrid.h">
@@ -176,6 +169,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

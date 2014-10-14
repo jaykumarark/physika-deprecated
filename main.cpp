@@ -11,12 +11,12 @@
 #include "TrackBall.h"
 #include "PlaneGrid.h"
 #include "PObject.h"`
-#include "TreeSystem.h"
 #include "Light.h"
 #include "Grid.h"
 #include "Skybox.h"
 #include <time.h>
 #include "PAudio.h"
+#include "Sphere.h"
 
 int gwidth = 1024;
 int gheight = 768;
@@ -26,13 +26,14 @@ TrackBall* trackBall;
 PlaneGrid* plane; 
 PObject* teapot;
 Light* sceneLight; 
-TreeSystem* fractal; 
+
 Grid* terrain;
-Skybox* sky;
 PAudio* audio;
+Sphere* sphere;
+
 
 //CubeMap
-vector<string> cubemap;
+
 
  
 //Keyboard variables
@@ -45,62 +46,56 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(1.f, 3000.f);
-	cam.setPosition(glm::vec3(0, 0, 20));
+	cam.setPosition(glm::vec3(0, 20, 20));
 	cam.lookAt(glm::vec3(0, 0, 0.0));
 	cam.setVelocity(20);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
-}
-void initCubeMap()
-{
-	cubemap.push_back("textures/spacebox/posx.jpg");
-	cubemap.push_back("textures/spacebox/negx.jpg");
-	cubemap.push_back("textures/spacebox/posy.jpg");
-	cubemap.push_back("textures/spacebox/negy.jpg");
-	cubemap.push_back("textures/spacebox/posz.jpg");
-	cubemap.push_back("textures/spacebox/negz.jpg");
-	sky = new Skybox(glm::vec3(0,0,0), "models/box.obj",cubemap,"skyboxVS.glsl", "skyboxFS.glsl");
 }
 
 void initOpengl()
 {
 	glEnable(GL_DEPTH_TEST);
 	initCamera();
-	initCubeMap();
 	trackBall			= new TrackBall(gwidth, gheight);
-	plane				= new PlaneGrid(glm::vec3(0,0,0), 
-										128, 128, 
-										glm::vec3(1), 
-										glm::vec3(1), 
-										glm::vec3(0.0),
+	plane				= new PlaneGrid(glm::vec3(-50,0,50),
+										2, 50, 
 										"textures/floor.png",
 										"gridVS.glsl", 
-										"gridFS.glsl");
+										"gridFS.glsl",
+										glm::vec3(0.2), 
+										glm::vec3(1.), 
+										glm::vec3(0.0));
 		
-	terrain					= new Grid(glm::vec3(-128,0,128), 
-										 2, 
-										 50.f, 
-										"textures/perlin2.jpg",
-										"textures/grass.jpg",
-										"terrainVS.glsl", 
-										"terrainFS.glsl", 
-										glm::vec3(1), 
-										glm::vec3(1), 
-										glm::vec3(0));
+	//terrain					= new Grid(glm::vec3(-128,0,128), 
+	//									 2, 
+	//									 50.f, 
+	//									"textures/perlin2.jpg",
+	//									"textures/grass.jpg",
+	//									"terrainVS.glsl", 
+	//									"terrainFS.glsl", 
+	//									glm::vec3(1), 
+	//									glm::vec3(1), 
+	//									glm::vec3(1));
 
-	//teapot				= new PObject(glm::vec3(0,30,0),"models/gargoyle.obj",
-	//								  "textures/grass.jpg",
-	//								  "diffuseVS.glsl",
-	//								  "diffuseFS.glsl",
-	//								  glm::vec3(1), 
-	//								  glm::vec3(0.7), 
-	//								  glm::vec3(1));
+	sphere				= new Sphere(glm::vec3(0,20,0),20, 20, 10, "vs.glsl", 
+												"fs.glsl",
+												glm::vec3(1), 
+												glm::vec3(1), 
+												glm::vec3(1.0));
 
-	sceneLight			= new Light(glm::vec3(0, 20, 100), 
+	teapot				= new PObject(glm::vec3(0,0,0),"models/Lucy.obj",
+									  "textures/grass.jpg",
+									  "diffuseVS.glsl",
+									  "diffuseFS.glsl",
+									  glm::vec3(1), 
+									  glm::vec3(0.1), 
+									  glm::vec3(0.5));
+
+	sceneLight			= new Light(20,
+									glm::vec3(0, 10, 0), 
 									glm::vec3(0.2, 0.2, 0.2), 
 									glm::vec3(0.7),
 									glm::vec3(1));
-	fractal				= new TreeSystem();
-	fractal->writeRules();
 	//audio				= new PAudio("iphone_metrognome_remix.mp3");
 	//audio->play();
 }
@@ -111,10 +106,12 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//teapot->render(cam, trackBall, sceneLight); 
-	//plane->render(cam, trackBall, sceneLight);
-	terrain->render(cam, trackBall, sceneLight);
+	teapot->render(cam, trackBall, sceneLight); 
+	plane->render(cam, trackBall, sceneLight);
+	//terrain->render(cam, trackBall, sceneLight);
 	sceneLight->render(cam, trackBall);
+
+	//sphere->render(cam, sceneLight);
 	//sky->render(cam);
 
 	/*glColor3f(1.f, 0.f, 0.f);
@@ -211,7 +208,6 @@ void motion(int x, int y)
 	cam.onMouseMove(x,y);	
 	
 }
-
 
 
 void processKeyboard(float dt)

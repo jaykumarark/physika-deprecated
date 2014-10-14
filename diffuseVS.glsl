@@ -15,6 +15,7 @@ out vec3 fVertexColor;
 
 //Matrices
 uniform mat4 mvp;
+
 void main()
 {
 	fVertexPosition = VertexPosition; 

@@ -50,9 +50,11 @@ void ModelLoader::InitMesh(const aiMesh* paiMesh)
 		const aiVector3D* pNormal = &(paiMesh->mNormals[i]);
 		const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
 
+		glm::vec3 n = glm::vec3(pNormal->x,pNormal->y,pNormal->z);
+
 		Vertex v(glm::vec3(pPos->x, pPos->y, pPos->z),
 			glm::vec2(pTexCoord->x, pTexCoord->y),
-			glm::vec3(pNormal->x, pNormal->y, pNormal->z), 
+			glm::vec3(glm::normalize(n)), 
 			glm::vec3(0));
 		m_data.push_back(v);
 	}
