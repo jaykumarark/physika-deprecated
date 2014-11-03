@@ -36,7 +36,8 @@ struct Edge
 
 struct Vertex
 {
-	std::stack<unsigned int> e;		
+	unsigned int v;					//indices of m_vertices
+	std::vector<int> e;	//indices of m_edge
 };
 
 
@@ -60,6 +61,8 @@ public:
 	void idle();
 	void showAreas();
 	void setupVertexNodes();
+	void collapseTriangle(int idx);	//face index is input
+	void collapseToPoint(int ei, int vi);
 	
 private:
 	std::vector<Face> m_faces; 

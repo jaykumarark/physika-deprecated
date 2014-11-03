@@ -16,6 +16,8 @@ ObjectSlab::ObjectSlab(std::string filename)
 	createEdges();
 	connectTwinEdges();
 	setupVertexNodes();
+	//collapseTriangle(0);
+	m_faceBool[0] = false;
 
 }
 ObjectSlab::~ObjectSlab(void)
@@ -110,11 +112,17 @@ void ObjectSlab::render(Camera cam, TrackBall* tb)
 
 void ObjectSlab::idle()
 {
-	showAreas();
+	//showAreas();
 	if(m_subindex < m_faces.size())
 	{
 		cout<<"Before sub division:"<<countActiveTriangles()<<endl;
-		subdivide(m_subindex);
+		if(computeArea(m_subindex) < 0.1)
+		{
+			collapseTriangle(m_subindex);
+		}
+		else{
+			subdivide(m_subindex);
+		}
 		cout<<"After sub division:"<<countActiveTriangles()<<endl;
 		m_subindex++;
 	}
@@ -345,6 +353,10 @@ void ObjectSlab::subdivide(int idx)
 
 		//index of new vertex is size - 1
 		int idxO = m_vertices.size() - 1;
+
+		Vertex v; 
+		v.v = idxO;
+		m_VertexNode.push_back(v);
 		
 		if(isSkinny(m_edges[f.ei[0]], m_vertices[idxO])){
 			flipEdge(f.ei[0], idxO);
@@ -370,6 +382,7 @@ void ObjectSlab::subdivide(int idx)
 		m_edges[m_faces[idx].ei[2]].isRemoved = true;
 
 		connectTwinEdges();
+
 
 	}
 }
@@ -401,7 +414,6 @@ bool ObjectSlab::isSkinny(const Edge e, const glm::vec3 o)
 
 	return false; 
 }
-
 //flip edges clockwise
 /*
 Flip Edge 
@@ -452,7 +464,7 @@ void ObjectSlab::flipEdge(int ei, int vi)
 	e1.opp = f3.vi[2];
 	e1.face = m_faces.size();
 	e1.twin = -1;
-	e1.isRemoved = false;
+	e1.isRemoved = false;	
 
 	e2.tail = f3.vi[1];
 	e2.head = f3.vi[2];
@@ -461,12 +473,15 @@ void ObjectSlab::flipEdge(int ei, int vi)
 	e2.twin = -1;
 	e2.isRemoved = false;
 
+
 	e3.tail = f3.vi[2];
 	e3.head = f3.vi[0];
 	e3.opp = f3.vi[1];
 	e3.face = m_faces.size();
 	e3.twin = -1;
 	e3.isRemoved = false;
+	//For the new barycenter vertex, assign this edge
+	m_VertexNode[f3.vi[2]].e.push_back(m_edges.size() + 2);
 
 	//Edges for face f4
 	e4.tail = f4.vi[0];
@@ -475,6 +490,7 @@ void ObjectSlab::flipEdge(int ei, int vi)
 	e4.face = m_faces.size()+1;
 	e4.twin = -1;
 	e4.isRemoved = false;
+	m_VertexNode[f4.vi[0]].e.push_back(m_edges.size() + 3);
 
 	e5.tail = f4.vi[1];
 	e5.head = f4.vi[2];
@@ -498,7 +514,6 @@ void ObjectSlab::flipEdge(int ei, int vi)
 	f4.ei[0] = m_edges.size() + 3;
 	f4.ei[1] = m_edges.size() + 4;
 	f4.ei[2] = m_edges.size() + 5;
-
 
 	m_edges.push_back(e1);
 	m_edges.push_back(e2);
@@ -547,6 +562,8 @@ void ObjectSlab::formFace(int ei, int idxO)
 	e3.face = m_faces.size();
 	e3.twin = -1;
 	e3.isRemoved = false;
+
+	m_VertexNode[f1.vi[2]].e.push_back(m_edges.size() + 2);
 
 	f1.ei[0] = m_edges.size() + 0;
 	f1.ei[1] = m_edges.size() + 1;
@@ -607,14 +624,87 @@ void ObjectSlab::setupVertexNodes()
 	for(int i = 0 ; i < m_vertices.size() ; i ++)
 	{
 		Vertex v;
+		v.v = i;
 		for(int j = 0 ; j < m_edges.size() ; j++)
 		{
 			if(m_edges[j].tail == i)
 			{
-				v.e.push(j);
+				v.e.push_back(j);
 			}
 		}
 		m_VertexNode.push_back(v);
 	}
+}
 
+void ObjectSlab::collapseTriangle(int idx)
+{
+	//Get reference to Face index
+	Face f = m_faces[idx];
+	m_faceBool[idx] = false;
+
+	//get reference to all edges
+	Edge e1 = m_edges[f.ei[0]];
+	Edge e2 = m_edges[f.ei[1]];
+	Edge e3 = m_edges[f.ei[2]];
+
+
+	vec3 A = m_vertices[f.vi[0]];
+	vec3 B = m_vertices[f.vi[1]];
+	vec3 C = m_vertices[f.vi[2]];
+
+	vec3 O = (A+B+C) / 3.f;
+
+	m_vertices.push_back(O);
+
+	//index of new vertex is size - 1
+	int idxO = m_vertices.size() - 1;
+	Vertex v;
+	v.v = idxO;
+	m_VertexNode.push_back(v);
+
+	//collapse to point
+	collapseToPoint(f.ei[0], idxO);
+	collapseToPoint(f.ei[1], idxO);
+	collapseToPoint(f.ei[2], idxO);
+
+
+	//mark each edge as deleted
+	m_edges[m_faces[idx].ei[0]].isRemoved = true;
+	m_edges[m_faces[idx].ei[1]].isRemoved = true;
+	m_edges[m_faces[idx].ei[2]].isRemoved = true;
+
+	connectTwinEdges();
+}
+
+void ObjectSlab::collapseToPoint(int ei, int vi)
+{
+	//Get reference to adjacent face
+	Face f = m_faces[m_edges[m_edges[ei].twin].face];
+
+	//alter the edges dependent on ei's end points
+	Edge twin = m_edges[m_edges[ei].twin];
+	Vertex v1 = m_VertexNode[twin.head];
+	Vertex v2 = m_VertexNode[twin.tail];
+
+	for(int i = 0 ; i < v1.e.size(); i++)
+	{
+		m_edges[v1.e[i]].tail = vi;
+		m_edges[m_edges[v1.e[i]].twin].head = vi;
+		m_VertexNode[vi].e.push_back(v1.e[i]);
+	}
+
+	for(int i = 0 ; i < v2.e.size(); i++)
+	{
+		m_edges[v2.e[i]].tail = vi;
+		m_edges[m_edges[v2.e[i]].twin].head = vi;
+		m_VertexNode[vi].e.push_back(v2.e[i]);
+	}
+
+
+	//Delete this face
+	m_faceBool[m_edges[m_edges[ei].twin].face] = false;
+
+	m_edges[f.ei[0]].isRemoved = true;
+	m_edges[f.ei[1]].isRemoved = true;
+	m_edges[f.ei[2]].isRemoved = true;
 }
