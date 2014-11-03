@@ -58,5 +58,5 @@ void main()
 	
 	vec4 texColor = texture(TextureSample2D, fVertexTexture);
 
-	outputColor = vec4(ambientTerm+diffuseTerm+spec, 1.f);
+	outputColor = vec4(ambientTerm+diffuseTerm, 1.f) * texColor+vec4(spec,1);
 }

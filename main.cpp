@@ -17,6 +17,7 @@
 #include <time.h>
 #include "PAudio.h"
 #include "Sphere.h"
+#include "ObjectSlab.h"
 
 int gwidth = 1024;
 int gheight = 768;
@@ -27,9 +28,11 @@ PlaneGrid* plane;
 PObject* teapot;
 Light* sceneLight; 
 
+
 Grid* terrain;
 PAudio* audio;
 Sphere* sphere;
+ObjectSlab* slab;
 
 
 //CubeMap
@@ -57,8 +60,8 @@ void initOpengl()
 	glEnable(GL_DEPTH_TEST);
 	initCamera();
 	trackBall			= new TrackBall(gwidth, gheight);
-	plane				= new PlaneGrid(glm::vec3(-50,0,50),
-										2, 50, 
+	plane				= new PlaneGrid(glm::vec3(-128,0,128),
+										2, 128, 
 										"textures/floor.png",
 										"gridVS.glsl", 
 										"gridFS.glsl",
@@ -83,7 +86,9 @@ void initOpengl()
 												glm::vec3(1), 
 												glm::vec3(1.0));
 
-	teapot				= new PObject(glm::vec3(0,10,0),"models/Lucy.obj",
+
+
+	teapot				= new PObject(glm::vec3(0,10,0),"models/box.obj",
 									  "textures/grass.jpg",
 									  "diffuseVS.glsl",
 									  "diffuseFS.glsl",
@@ -96,6 +101,8 @@ void initOpengl()
 									glm::vec3(0.2, 0.2, 0.2), 
 									glm::vec3(0.7),
 									glm::vec3(1));
+
+	slab = new ObjectSlab("models/box.obj");
 	//audio				= new PAudio("iphone_metrognome_remix.mp3");
 	//audio->play();
 }
@@ -106,12 +113,15 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	teapot->render(cam, trackBall, sceneLight); 
-	plane->render(cam, trackBall, sceneLight);
+	//teapot->render(cam, trackBall, sceneLight); 
+	//plane->render(cam, trackBall, sceneLight);
 	//terrain->render(cam, trackBall, sceneLight);
-	sceneLight->render(cam, trackBall);
+	//sceneLight->render(cam, trackBall);
 
-	sphere->render(cam, sceneLight);
+	//sphere->render(cam, sceneLight);
+
+	slab->render(cam, trackBall);
+
 	//sky->render(cam);
 
 	/*glColor3f(1.f, 0.f, 0.f);
@@ -213,7 +223,10 @@ void motion(int x, int y)
 void processKeyboard(float dt)
 {
 	
-	
+	if(keyStates['p'] || keyStates['P'])
+	{
+		slab->idle();
+	}
 	if(keyStates['a'] || keyStates['A'])
 	{
 		cam.offsetPosition(cam.velocity()*dt*-cam.right());
@@ -274,7 +287,7 @@ void createGlutCallBacks()
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv); 
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ACCUM);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ACCUM |GL_MULTISAMPLE);
 	glutInitWindowSize(gwidth,gheight);
 	glutInitWindowPosition(100, 30);
 	glutCreateWindow("Physika");

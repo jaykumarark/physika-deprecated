@@ -17,7 +17,7 @@ PObject::PObject(glm::vec3 p,
 	m_vertexFile = vertexFile;
 	m_fragmentFile = fragmentFile;
 	m_model = glm::translate(glm::mat4(1.0), p);
-	m_model = glm::scale(m_model,glm::vec3(50,50,50));
+	m_model = glm::scale(m_model,glm::vec3(1,1,1));
 	init();
 	setMaterial(a, d, s);
 

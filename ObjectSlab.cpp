@@ -15,6 +15,8 @@ ObjectSlab::ObjectSlab(std::string filename)
 	importStream(filename);
 	createEdges();
 	connectTwinEdges();
+	setupVertexNodes();
+
 }
 ObjectSlab::~ObjectSlab(void)
 {
@@ -41,8 +43,6 @@ void ObjectSlab::select(float mx, float my, Camera cam)
 
 	
 }
-
-
 
 void ObjectSlab::render(Camera cam, TrackBall* tb)
 {
@@ -110,6 +110,7 @@ void ObjectSlab::render(Camera cam, TrackBall* tb)
 
 void ObjectSlab::idle()
 {
+	showAreas();
 	if(m_subindex < m_faces.size())
 	{
 		cout<<"Before sub division:"<<countActiveTriangles()<<endl;
@@ -133,6 +134,10 @@ bool ObjectSlab::importStream(std::string filename)
 
 	while(getline(objFile, line))
 	{
+		if(line.size() > 1)
+		{
+
+		
 		char one = line[0];
 		char two = line[1];
 		if((line[0] == 'f') && (line[1] = ' '))
@@ -249,6 +254,7 @@ bool ObjectSlab::importStream(std::string filename)
 
 			n = vec3(atof(g1.c_str()), atof(g2.c_str()), atof(g3.c_str()));
 			m_normals.push_back(n);
+		}
 		}
 	}
 	return true;
@@ -509,7 +515,6 @@ void ObjectSlab::flipEdge(int ei, int vi)
 	m_isSelect.push_back(false); // f4
 }
 
-
 void ObjectSlab::formFace(int ei, int idxO)
 {
 	Face f1;
@@ -568,4 +573,48 @@ int ObjectSlab::countActiveTriangles()
 		}
 	}
 	return count;
+}
+
+float ObjectSlab::computeArea(int idx)
+{
+	Face f = m_faces[idx];
+
+	vec3 a = m_vertices[f.vi[0]];
+	vec3 b = m_vertices[f.vi[1]];
+	vec3 c = m_vertices[f.vi[2]];
+
+	vec3 ab = a - b;
+	vec3 ac = a - c;
+
+	float area = fabs(0.5*glm::length(cross(ab, ac)));
+
+	return area;
+}
+
+void ObjectSlab::showAreas()
+{
+	std::vector<float> areas;
+	std::vector<float> lol;
+	for(int i = 0 ; i < m_faces.size() ; i++)
+	{
+		areas.push_back(computeArea(i));
+	}
+	lol = areas;
+}
+
+void ObjectSlab::setupVertexNodes()
+{
+	for(int i = 0 ; i < m_vertices.size() ; i ++)
+	{
+		Vertex v;
+		for(int j = 0 ; j < m_edges.size() ; j++)
+		{
+			if(m_edges[j].tail == i)
+			{
+				v.e.push(j);
+			}
+		}
+		m_VertexNode.push_back(v);
+	}
+
 }

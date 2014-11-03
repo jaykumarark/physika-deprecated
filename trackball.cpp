@@ -38,7 +38,7 @@ void TrackBall::mouseMove(int x, int y)
 			glm::dot(lastPoint, currPoint);
 			print(currPoint);
 			cout<<"angle: "<<newAngle <<endl;
-			m_rotate = glm::rotate(glm::mat4(1), newAngle + lastAngle, m_axis);
+			m_rotate = glm::rotate(glm::mat4(1), newAngle + lastAngle, glm::vec3(m_axis.x, m_axis.y, 0));
 			lastAngle += newAngle;
 		}
 	}
