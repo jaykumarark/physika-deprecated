@@ -17,7 +17,7 @@ ObjectSlab::ObjectSlab(std::string filename)
 	connectTwinEdges();
 	setupVertexNodes();
 	//collapseTriangle(0);
-	m_faceBool[0] = false;
+	//m_faceBool[0] = false;
 
 }
 ObjectSlab::~ObjectSlab(void)
@@ -77,23 +77,26 @@ void ObjectSlab::render(Camera cam, TrackBall* tb)
 			if(i%3 == 2)
 				glColor3f(0.f, 0.6f, 1.f);
 
-			float x = m_vertices[m_faces[i].vi[0]].x;
-			float y = m_vertices[m_faces[i].vi[0]].y;
-			float z = m_vertices[m_faces[i].vi[0]].z;
+			Face f = m_faces[i];
+
+
+			float x = m_vertices[m_edges[f.ei[0]].tail].x;
+			float y = m_vertices[m_edges[f.ei[0]].tail].y;
+			float z = m_vertices[m_edges[f.ei[0]].tail].z;
 	
 			glColor3f(1.f, 0.3f, 0.f);
 			glVertex3f(x, y, z);
 	
-			x = m_vertices[m_faces[i].vi[1]].x;
-			y = m_vertices[m_faces[i].vi[1]].y;
-			z = m_vertices[m_faces[i].vi[1]].z;
+			x = m_vertices[m_edges[f.ei[0]].head].x;
+			y = m_vertices[m_edges[f.ei[0]].head].y;
+			z = m_vertices[m_edges[f.ei[0]].head].z;
 
 			glColor3f(0.f, 0.6f, 1.f);
 			glVertex3f(x, y, z);
 	
-			x = m_vertices[m_faces[i].vi[2]].x;
-			y = m_vertices[m_faces[i].vi[2]].y;
-			z = m_vertices[m_faces[i].vi[2]].z;
+			x = m_vertices[m_edges[f.ei[0]].opp].x;
+			y = m_vertices[m_edges[f.ei[0]].opp].y;
+			z = m_vertices[m_edges[f.ei[0]].opp].z;
 
 			glColor3f(0.f, 1.f, .6f);
 			glVertex3f(x, y, z);

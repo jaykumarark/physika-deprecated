@@ -49,7 +49,7 @@ void initCamera(){
 	cam.setFov(60);
 	cam.setAspRatio(gwidth/gheight);
 	cam.setNearFar(1.f, 3000.f);
-	cam.setPosition(glm::vec3(0, 20, 20));
+	cam.setPosition(glm::vec3(0, 20, -20));
 	cam.lookAt(glm::vec3(0, 0, 0.0));
 	cam.setVelocity(20);
 	glutWarpPointer(cam.mMouseX, cam.mMouseY);
