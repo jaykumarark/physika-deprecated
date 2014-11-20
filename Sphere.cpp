@@ -84,7 +84,7 @@ void Sphere::init()
 	m_vbo->init(data, indices);
 }
 
-void Sphere::render(Camera cam, Light* light)
+void Sphere::render(ACamera* cam, Light* light)
 {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -97,17 +97,17 @@ void Sphere::render(Camera cam, Light* light)
 	m_shader->setSampler("TextureSample2D", 0);
 
 	//Setting up Matrices
-	glm::mat4 m = cam.matrix() * m_model;
-	glm::mat3 NormalMatrix = glm::mat3(cam.view()*m_model);
+	glm::mat4 m = cam->matrix() * m_model;
+	glm::mat3 NormalMatrix = glm::mat3(cam->view()*m_model);
 	NormalMatrix = glm::transpose(glm::inverse(NormalMatrix));
 
-	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
-	m_shader->setUniform("ModelViewMatrix",  cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
+	m_shader->setUniform("ProjectionMatrix", cam->projection());		//uniform mat4 ProjectionMatrix; 
+	m_shader->setUniform("ModelViewMatrix",  cam->view()*m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
-	m_shader->setUniform("ViewMatrix", cam.view());	
+	m_shader->setUniform("ViewMatrix", cam->view());	
 	m_shader->setUniform("NormalMatrix", NormalMatrix);
 
-	m_shader->setUniform("EyePositionInWorld", cam.position());
+	m_shader->setUniform("EyePositionInWorld", cam->position());
 
 	//Light Position
 	m_shader->setUniform("lightPosition", lp);

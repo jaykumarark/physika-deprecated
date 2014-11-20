@@ -4,16 +4,16 @@
 #include <gl/glew.h>
 #include <glm\gtc\type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
-#include "Camera.h"
+#include "ACamera.h"
 #include <iostream>
 
 class PickingRay
 {
 public:
 	PickingRay(int width, int height);
-	void getRay(float mx, float my, Camera cam);
-	bool intersect(glm::vec3, glm::vec3, glm::vec3, float mx, float my, Camera cam, glm::mat4 m);
-	void render(Camera cam);
+	void getRay(float mx, float my, ACamera* cam);
+	bool intersect(glm::vec3, glm::vec3, glm::vec3, float mx, float my, ACamera* cam, glm::mat4 m);
+	void render(ACamera* cam);
 	glm::vec3 PickingRay::rayDir();
 	glm::vec3 PickingRay::rayPos();
 	~PickingRay(void);

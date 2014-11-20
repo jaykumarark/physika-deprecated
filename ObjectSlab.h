@@ -13,14 +13,12 @@
 #include "Camera.h"
 #include "trackball.h"
 #include "PickingRay.h"
+#include "ACamera.h"
 
 
 struct Face
 {
-	unsigned int vi[3];	// ccw winding of vertex indices
-	unsigned int ti[3];	// texture indices
-	unsigned int ni[3]; // normal indices
-	unsigned int ei[3]; // index of the edges
+	unsigned int ei;	//refernce one edge preferrably first one
 };
 
 struct Edge
@@ -28,15 +26,16 @@ struct Edge
 	//indices of the vertices of an edge
 	unsigned int head; 
 	unsigned int tail; 
-	unsigned int opp; //vertex opposite to an edge in a face
+	unsigned int next; //next edge index;
 	unsigned int face; //reference to a face
+	int			 twin; //twin edge 
 	bool		 isRemoved; // initially false
-	int twin;		 //twin edge 
+	
 };
 
 struct Vertex
 {
-	unsigned int v;					//indices of m_vertices
+	unsigned int v;	 //indices of m_vertices
 	std::vector<int> e;	//indices of m_edge
 };
 
@@ -47,22 +46,25 @@ class ObjectSlab
 public:
 	ObjectSlab(std::string filename);
    ~ObjectSlab(void);
+	std::string trim(std::string const &str);
 	bool importStream(std::string filename);
-	void createEdges();
 	void connectTwinEdges();
 	void subdivide(int idx);
-	bool isSkinny(const Edge e, const glm::vec3 o);
+	bool isSkinny(const Edge &e, const glm::vec3 &o);
 	void flipEdge(int ei, int vi);		//flip an edge given a barycentric coordinate and an edge index
 	void formFace(int ei, int vi);
 	int  countActiveTriangles();
 	float computeArea(int idx);		//face index is input
-	void select(float mx, float my, Camera cam);
-	void render(Camera cam, TrackBall* tb);
+	void select(float mx, float my, ACamera* cam);
+	void render(ACamera* cam, TrackBall* tb);
 	void idle();
 	void showAreas();
 	void setupVertexNodes();
 	void collapseTriangle(int idx);	//face index is input
+	void findATwin(int ei);
 	void collapseToPoint(int ei, int vi);
+	bool mToggleDeletedFaces;
+	bool isFaceBoundary(int idx);
 	
 private:
 	std::vector<Face> m_faces; 
@@ -76,5 +78,6 @@ private:
 	glm::mat4 m_model;
 	PickingRay* m_ray;
 	unsigned int m_subindex;			//Temporary. Can be removed later. 
+	
 };
 

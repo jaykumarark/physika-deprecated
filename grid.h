@@ -4,7 +4,7 @@
 #include <vector>
 #include <glm\glm.hpp>
 #include "image.h"
-#include "camera.h"
+#include "ACamera.h"
 #include "Light.h"
 #include "VertexBufferObject.h"
 #include "ModelLoader.h"
@@ -40,7 +40,7 @@ public:
 	void init();
 	void initGrid();
 	void setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3  s);
-	void render(Camera cam, TrackBall* tb, Light* light);
+	void render(ACamera* cam, TrackBall* tb, Light* light);
 
 private:
 	int mW, mH, m_cs, m_elevation;

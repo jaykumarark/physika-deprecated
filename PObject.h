@@ -3,7 +3,7 @@
 #include "GLSLShader.h"
 #include "VertexBufferObject.h"
 #include "ModelLoader.h"
-#include "Camera.h"
+#include "ACamera.h"
 #include "trackball.h"
 #include "Light.h"
 #include "texture.h"
@@ -29,7 +29,7 @@ public:
 			glm::vec3 d, 
 			glm::vec3 s);
 	void init();
-	void render(Camera cam, TrackBall* tb, Light* light);
+	void render(ACamera* cam, TrackBall* tb, Light* light);
 	void setMaterial(glm::vec3 a, glm::vec3 d, glm::vec3 s);
 	~PObject(void);
 

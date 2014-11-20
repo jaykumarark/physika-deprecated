@@ -3,7 +3,7 @@
 #include "VertexBufferObject.h"
 #include "GLSLShader.h"
 #include  "ModelLoader.h"
-#include "Camera.h"
+#include "ACamera.h"
 #include "trackball.h"
 
 class Light
@@ -20,7 +20,7 @@ public:
 	Light(float radius, glm::vec3 c, glm::vec3 a, glm::vec3 d, glm::vec3 s);
 	~Light(void);
 	void init(); 
-	void render(Camera cam, TrackBall* tb);
+	void render(ACamera* cam);
 	glm::vec3 position();
 	LightProperties properties(); 
 	void setProperty(glm::vec3 a, glm::vec3 d, glm::vec3 s);

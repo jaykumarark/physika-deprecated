@@ -131,7 +131,7 @@ void PlaneGrid::init()
 }
 
 
-void PlaneGrid::render(Camera cam, TrackBall* tb, Light* light)
+void PlaneGrid::render(ACamera* cam, TrackBall* tb, Light* light)
 {
 	//Light Position
 	Light::LightProperties lprops = light->properties();
@@ -145,17 +145,17 @@ void PlaneGrid::render(Camera cam, TrackBall* tb, Light* light)
 	m_shader->setSampler("TextureSample2D", 0);
 
 	//Setting up Matrices
-	glm::mat4 m = cam.matrix() * tb->matrix() * m_model;
-	glm::mat3 NormalMatrix = glm::mat3(cam.view()*m_model);
+	glm::mat4 m = cam->matrix() * tb->matrix() * m_model;
+	glm::mat3 NormalMatrix = glm::mat3(cam->view()*m_model);
 	NormalMatrix = glm::transpose(glm::inverse(NormalMatrix));
 
-	m_shader->setUniform("ProjectionMatrix", cam.projection());		//uniform mat4 ProjectionMatrix; 
-	m_shader->setUniform("ModelViewMatrix",  cam.view()*m_model);	//uniform mat4 ModelViewMatrix;
+	m_shader->setUniform("ProjectionMatrix", cam->projection());		//uniform mat4 ProjectionMatrix; 
+	m_shader->setUniform("ModelViewMatrix",  cam->view()*m_model);	//uniform mat4 ModelViewMatrix;
 	m_shader->setUniform("mvp",m);									//uniform mat4 mvp;			
-	m_shader->setUniform("ViewMatrix", cam.view());	
+	m_shader->setUniform("ViewMatrix", cam->view());	
 	m_shader->setUniform("NormalMatrix", NormalMatrix);
 
-	m_shader->setUniform("EyePositionInWorld", cam.position());
+	m_shader->setUniform("EyePositionInWorld", cam->position());
 	//Light Position
 	m_shader->setUniform("lightPosition", lp);
 

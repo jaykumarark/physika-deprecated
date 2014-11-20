@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include <vector>
 #include <glm\glm.hpp>
-#include "camera.h"
+#include "ACamera.h"
 #include "VertexBufferObject.h"
 #include "GLSLShader.h"
 #include "Texture.h"
@@ -25,7 +25,7 @@ public:
 
 	Sphere(glm::vec3 p,int stacks, int slices, float radius, std::string vertexFile, std::string fragmentFile,
 			glm::vec3 a, glm::vec3 d, glm::vec3 s);
-	void render(Camera cam, Light* light);
+	void render(ACamera* cam, Light* light);
 private: 
 
 	void init();

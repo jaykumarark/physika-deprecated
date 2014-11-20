@@ -7,7 +7,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 #include <math.h>
-#include "Camera.h"
 #include "TrackBall.h"
 #include "PlaneGrid.h"
 #include "PObject.h"`
@@ -18,11 +17,13 @@
 #include "PAudio.h"
 #include "Sphere.h"
 #include "ObjectSlab.h"
+#include "ACamera.h"
 
 int gwidth = 1024;
 int gheight = 768;
 
 Camera cam;
+ACamera* acam;
 TrackBall* trackBall;
 PlaneGrid* plane; 
 PObject* teapot;
@@ -44,15 +45,23 @@ bool keyStates[256];
 
 
 void initCamera(){
-	cam.setWindowCoords(gwidth, gheight);
-	cam.init();
-	cam.setFov(60);
-	cam.setAspRatio(gwidth/gheight);
-	cam.setNearFar(1.f, 3000.f);
-	cam.setPosition(glm::vec3(0, 20, -20));
-	cam.lookAt(glm::vec3(0, 0, 0.0));
-	cam.setVelocity(20);
-	glutWarpPointer(cam.mMouseX, cam.mMouseY);
+	//cam.setWindowCoords(gwidth, gheight);
+	//cam.init();
+	//cam.setFov(60);
+	//cam.setAspRatio(gwidth/gheight);
+	//cam.setNearFar(1.f, 3000.f);
+	//cam.setPosition(glm::vec3(0, 20, 20));
+	//cam.lookAt(glm::vec3(0, 0, 0.0));
+	//cam.setVelocity(5);
+	//glutWarpPointer(cam.mMouseX, cam.mMouseY);
+
+	acam = new ACamera();
+	acam->SetWindowSize(gwidth, gheight);
+	acam->SetParams(60, 1.f, 1000.f, gwidth/gheight);
+	acam->SetPosition(glm::vec3(0,0,5));
+	acam->SetZoom(10);
+	acam->SetLookAt(glm::vec3(0,0,0));
+	acam->SetVelocity(5);
 }
 
 void initOpengl()
@@ -88,7 +97,7 @@ void initOpengl()
 
 
 
-	teapot				= new PObject(glm::vec3(0,10,0),"models/box.obj",
+	teapot				= new PObject(glm::vec3(0,0,0),"models/sphere.obj",
 									  "textures/grass.jpg",
 									  "diffuseVS.glsl",
 									  "diffuseFS.glsl",
@@ -102,7 +111,7 @@ void initOpengl()
 									glm::vec3(0.7),
 									glm::vec3(1));
 
-	slab = new ObjectSlab("models/box.obj");
+	slab = new ObjectSlab("models/blob.obj");
 	//audio				= new PAudio("iphone_metrognome_remix.mp3");
 	//audio->play();
 }
@@ -113,15 +122,16 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//teapot->render(cam, trackBall, sceneLight); 
-	//plane->render(cam, trackBall, sceneLight);
-	//terrain->render(cam, trackBall, sceneLight);
-	//sceneLight->render(cam, trackBall);
+	//teapot->render(acam, trackBall, sceneLight); 
+	//plane->render(acam, trackBall, sceneLight);
+	//terrain->render(acam, trackBall, sceneLight);
+	sceneLight->render(acam);
 
-	//sphere->render(cam, sceneLight);
+	//sphere->render(acam, sceneLight);
 
-	slab->render(cam, trackBall);
-
+	slab->render(acam, trackBall);
+	acam->up();
+	acam->forward();
 	//sky->render(cam);
 
 	/*glColor3f(1.f, 0.f, 0.f);
@@ -178,32 +188,32 @@ void keyboardUp(unsigned char key, int x, int y)
 
 void mwheel(int wheel, int direction, int x, int y)
 {
-	
+	acam->onMouseWheel(direction);
 }
 
 void mouse(int button, int state, int x, int y)
 {
 	if(state == GLUT_DOWN && button == GLUT_MIDDLE_BUTTON)
 	{
-		//triangle->select(x, y, cam);
+		slab->select(x, y, acam);
 	}
 
 	if(state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)
 	{
-		trackBall->mouseDown(x, y);
+		acam->onMouseDown(x,y);
 	}
 	if(state == GLUT_UP && button == GLUT_LEFT_BUTTON)
 	{
-		trackBall->mouseUp();
+		acam->onMouseUp(x,y);
 	}
 
 	if(state == GLUT_DOWN && button == GLUT_RIGHT_BUTTON)
 	{
-		cam.onMouseDown();
+		
 	}
 	if(state == GLUT_UP && button == GLUT_RIGHT_BUTTON)
 	{
-		cam.onMouseUp();
+		
 	}
 }
 
@@ -214,15 +224,26 @@ void passiveMotion(int x, int y)
 
 void motion(int x, int y)
 {
-	trackBall->mouseMove(x, y);
-	cam.onMouseMove(x,y);	
+	//trackBall->mouseMove(x, y);
+	//cam.onMouseMove(x,y);
+	acam->onMouseMove(x,y);
 	
 }
 
 
 void processKeyboard(float dt)
 {
-	
+	if(keyStates['t'] || keyStates['T'])
+	{
+		slab->mToggleDeletedFaces = true;
+	}
+
+	if(keyStates['u'] || keyStates['U'])
+	{
+		slab->mToggleDeletedFaces = false;
+	}
+
+
 	if(keyStates['p'] || keyStates['P'])
 	{
 		slab->idle();
@@ -261,12 +282,7 @@ void idle()
 {
 	float dt= 0.1;
 	processKeyboard(dt);
-	if(keyStates['P'] || keyStates['p'])
-	{
-		//triangle->idle();
-	}
 	sceneLight->update();
-	//audio->update();
 }
 
 void createGlutCallBacks()

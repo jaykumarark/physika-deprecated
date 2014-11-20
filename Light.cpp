@@ -50,7 +50,7 @@ void Light::init()
 	m_shader = new GLSLShader("LightVS.glsl", "LightFS.glsl");	
 }
 
-void Light::render(Camera cam, TrackBall* tb)
+void Light::render(ACamera* cam)
 {
 	//glPolygonMode(GL_FRONT, GL_LINE);
 	m_pos.x=m_Center.x+mR*sin(m_angle/12);
@@ -61,7 +61,7 @@ void Light::render(Camera cam, TrackBall* tb)
 	m_model = glm::mat4(1);
 	//m_model = glm::rotate(m_model, m_angle, glm::vec3(0, 1, 0));
 	m_model = glm::translate(m_model, m_pos);
-	glm::mat4 m = cam.matrix() * m_model;
+	glm::mat4 m = cam->matrix() * m_model;
 
 	//Setup Matrices
 	m_shader->setUniform("mvp", m);
