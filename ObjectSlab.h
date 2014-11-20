@@ -62,9 +62,10 @@ public:
 	void setupVertexNodes();
 	void collapseTriangle(int idx);	//face index is input
 	void findATwin(int ei);
-	void collapseToPoint(int ei, int vi);
+	void collapseToPoint(int ei);
 	bool mToggleDeletedFaces;
 	bool isFaceBoundary(int idx);
+	float edgeLength(int ei);
 	
 private:
 	std::vector<Face> m_faces; 

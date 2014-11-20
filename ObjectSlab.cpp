@@ -128,16 +128,14 @@ void ObjectSlab::idle()
 	//showAreas();
 	if(m_subindex < m_faces.size())
 	{
-		if(!isFaceBoundary(m_subindex))
+	
+		if(computeArea(m_subindex) < 0.1)
+		{
 			collapseTriangle(m_subindex);
-		//subdivide(m_subindex);
-	//	/*if(computeArea(m_subindex) < 0.1)
-	//	{
-	//		collapseTriangle(m_subindex);
-	//	}
-	//	else{
-	//		subdivide(m_subindex);
-	//	}*/
+		}
+		else{
+			subdivide(m_subindex);
+		}
 		m_subindex++;
 	}
 }
@@ -783,41 +781,62 @@ void ObjectSlab::collapseTriangle(int idx)
 	m_edges[e2].isRemoved = true;
 	m_edges[e3].isRemoved = true;
 
-	vec3 A = m_vertices[m_edges[e1].tail];
-	vec3 B = m_vertices[m_edges[e2].tail];
-	vec3 C = m_vertices[m_edges[e3].tail];
+	
+	float A = edgeLength(e1);
+	float B = edgeLength(e2);
+	float C = edgeLength(e3);
 
-	vec3 O = (A+B+C) / 3.f;
-
-	m_vertices.push_back(O);
-
-	//index of new vertex is size - 1
-	int idxO = m_vertices.size() - 1;
-	Vertex v;
-	v.v = idxO;
-	m_VertexNode.push_back(v);
-
-	//collapse to point
-	collapseToPoint(e1, idxO);
-	collapseToPoint(e2, idxO);
-	collapseToPoint(e3, idxO);
+	//collapse to center
+	//choose shortest edge to collapse
+	//this leads to consistent mesh
+	if(A < B && A < C)
+	{
+		collapseToPoint(e1);
+	}
+	else if(B < A && B < C)
+	{	
+		collapseToPoint(e2);
+	}
+	else{
+		collapseToPoint(e3);
+	}
 
 	connectTwinEdges();
-	
 }
 
-void ObjectSlab::collapseToPoint(int ei, int vi)
+float ObjectSlab::edgeLength(int ei)
 {
-	//Get reference to adjacent face
-	Face f = m_faces[m_edges[m_edges[ei].twin].face];
+	vec3 A = m_vertices[m_edges[ei].tail];
+	vec3 B = m_vertices[m_edges[ei].head];
+
+	float len = glm::length(B-A);
+
+	return len;
+}
+
+void ObjectSlab::collapseToPoint(int ei)
+{
+	vec3 A = m_vertices[m_edges[ei].tail];
+	vec3 B = m_vertices[m_edges[ei].head];
+	
+	//computer center
+	//edge collapses to this point
+	vec3 O = (A+B)/2.f;
+
+	m_vertices.push_back(O);
+	int vi = m_vertices.size()-1;
+	Vertex v; 
+	v.v = vi;
+	m_VertexNode.push_back(v);
+
+
 	int e[3];
 
+	//twin edge
 	e[0] = m_edges[ei].twin;
 	e[1] = m_edges[e[0]].next;
 	e[2] = m_edges[e[1]].next;
 
-	int twin1 = m_edges[e[1]].twin;
-	int twin2 = m_edges[e[2]].twin;
 
 	//Delete this face
 	m_faceBool[m_edges[m_edges[ei].twin].face] = false;
@@ -833,25 +852,17 @@ void ObjectSlab::collapseToPoint(int ei, int vi)
 
 	for(int i = 0 ; i < v1.e.size(); i++)
 	{
-		if(!m_edges[v1.e[i]].isRemoved)
-		{
-			m_edges[v1.e[i]].tail = vi;
-		}
-		if(!m_edges[m_edges[v1.e[i]].twin].isRemoved){
-			m_edges[m_edges[v1.e[i]].twin].head = vi;
-		}
+		m_edges[v1.e[i]].tail = vi;
+		m_edges[m_edges[v1.e[i]].twin].head = vi;
+		m_VertexNode[vi].e.push_back(v1.e[i]);
 		
 	}
 
 	for(int i = 0 ; i < v2.e.size(); i++)
 	{
-		if(!m_edges[v2.e[i]].isRemoved)
-		{
-			m_edges[v2.e[i]].tail = vi;
-		}
-		if(!m_edges[m_edges[v2.e[i]].twin].isRemoved){
-			m_edges[m_edges[v2.e[i]].twin].head = vi;
-		}
+		m_edges[v2.e[i]].tail = vi;
+		m_edges[m_edges[v2.e[i]].twin].head = vi;
+		m_VertexNode[vi].e.push_back(v2.e[i]);
 	}
 	//findATwin(twin1);
 	//findATwin(twin2);
