@@ -135,6 +135,7 @@ void ObjectSlab::idle()
 		}
 		else{
 			subdivide(m_subindex);
+			//collapseTriangle(m_subindex);
 		}
 		m_subindex++;
 	}
@@ -789,16 +790,23 @@ void ObjectSlab::collapseTriangle(int idx)
 	//collapse to center
 	//choose shortest edge to collapse
 	//this leads to consistent mesh
+
+	//before collapsing check if it okay to collapse
+	//
+
 	if(A < B && A < C)
 	{
-		collapseToPoint(e1);
+		//if(is_collapse_ok(e1))
+			collapseToPoint(e1);
 	}
 	else if(B < A && B < C)
 	{	
-		collapseToPoint(e2);
+		//if(is_collapse_ok(e2))
+			collapseToPoint(e2);
 	}
 	else{
-		collapseToPoint(e3);
+		//if(is_collapse_ok(e3))
+			collapseToPoint(e3);
 	}
 
 	connectTwinEdges();
@@ -812,6 +820,63 @@ float ObjectSlab::edgeLength(int ei)
 	float len = glm::length(B-A);
 
 	return len;
+}
+
+bool ObjectSlab::is_collapse_ok(int ei)
+{
+	Edge e = m_edges[ei];
+
+	Vertex v1 = m_VertexNode[e.tail];
+	Vertex v2 = m_VertexNode[e.head];
+
+	int count = 0;
+
+	for(int i = 0; i < v1.e.size();i++)
+	{
+		vec3 head1 = m_vertices[m_edges[v1.e[i]].head];
+		vec3 tail1 = m_vertices[m_edges[v1.e[i]].tail];
+		for(int j = 0 ; j< v2.e.size();j++)
+		{
+			vec3 head2 = m_vertices[m_edges[v2.e[j]].head];
+			vec3 tail2 = m_vertices[m_edges[v2.e[j]].tail];
+
+			if(intersect(head1, tail1, head2, tail2)){
+				count++;
+			}
+			//if number of intersections on either side is greater than 2, 
+			//return false because this edge is a not a good candidate for collapse
+			if(count>2)
+			{
+				return false;
+			}
+
+		}	
+	}
+
+	return true;
+}
+
+//source: http://stackoverflow.com/questions/2316490/the-algorithm-to-find-the-point-of-intersection-of-two-3d-line-segment
+bool ObjectSlab::intersect(vec3 head1, vec3 tail1, vec3 head2, vec3 tail2)
+{
+	vec3 a = head1 - tail1; 
+	vec3 b = head2 - tail2; 
+	vec3 c = head2 - head1; 
+	float epsilon = 0.00001;
+
+	float tripleProduct = dot(c, cross(a, b));
+	if( tripleProduct != 0.0) // lines are not coplanar - naive comparison to zero
+		return false; 
+	float difference = fabs((tripleProduct - 0.0f));
+    if (!(difference <= epsilon))	//checking against epsilon
+        return false;
+
+	float s = dot(cross(c, b), cross(a, b)) / glm::length2(cross(a, b));
+
+	if(s >= 0.0f && s <=1.0f)
+		return true;
+
+	return false;
 }
 
 void ObjectSlab::collapseToPoint(int ei)

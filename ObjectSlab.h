@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <glm\glm.hpp>
 #include <glm\gtc\type_ptr.hpp>
+#include <glm\gtx\norm.hpp>
 #include <gl\glew.h>
 #include "Camera.h"
 #include "trackball.h"
@@ -66,6 +67,8 @@ public:
 	bool mToggleDeletedFaces;
 	bool isFaceBoundary(int idx);
 	float edgeLength(int ei);
+	bool is_collapse_ok(int ei);
+	bool intersect(glm::vec3, glm::vec3, glm::vec3, glm::vec3);
 	
 private:
 	std::vector<Face> m_faces; 
