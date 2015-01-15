@@ -769,47 +769,49 @@ void ObjectSlab::setupVertexNodes()
 void ObjectSlab::collapseTriangle(int idx)
 {
 	//Get reference to Face index
-	Face f = m_faces[idx];
-	m_faceBool[idx] = false;
+	if(m_faceBool[idx]){
+		Face f = m_faces[idx];
+		m_faceBool[idx] = false;
 
-	//get reference to all edges
-	int e1 = f.ei;
-	int e2 = m_edges[e1].next;
-	int e3 = m_edges[e2].next;
+		//get reference to all edges
+		int e1 = f.ei;
+		int e2 = m_edges[e1].next;
+		int e3 = m_edges[e2].next;
 
-	//mark each edge as deleted
-	m_edges[e1].isRemoved = true;
-	m_edges[e2].isRemoved = true;
-	m_edges[e3].isRemoved = true;
+		//mark each edge as deleted
+		m_edges[e1].isRemoved = true;
+		m_edges[e2].isRemoved = true;
+		m_edges[e3].isRemoved = true;
 
-	
-	float A = edgeLength(e1);
-	float B = edgeLength(e2);
-	float C = edgeLength(e3);
+		
+		float A = edgeLength(e1);
+		float B = edgeLength(e2);
+		float C = edgeLength(e3);
 
-	//collapse to center
-	//choose shortest edge to collapse
-	//this leads to consistent mesh
+		//collapse to center
+		//choose shortest edge to collapse
+		//this leads to consistent mesh
 
-	//before collapsing check if it okay to collapse
-	//
+		//before collapsing check if it okay to collapse
+		//
 
-	if(A < B && A < C)
-	{
-		//if(is_collapse_ok(e1))
-			collapseToPoint(e1);
+		if(A < B && A < C)
+		{
+			//if(is_collapse_ok(e1))
+				collapseToPoint(e1);
+		}
+		else if(B < A && B < C)
+		{	
+			//if(is_collapse_ok(e2))
+				collapseToPoint(e2);
+		}
+		else{
+			//if(is_collapse_ok(e3))
+				collapseToPoint(e3);
+		}
+
+		connectTwinEdges();
 	}
-	else if(B < A && B < C)
-	{	
-		//if(is_collapse_ok(e2))
-			collapseToPoint(e2);
-	}
-	else{
-		//if(is_collapse_ok(e3))
-			collapseToPoint(e3);
-	}
-
-	connectTwinEdges();
 }
 
 float ObjectSlab::edgeLength(int ei)
@@ -845,14 +847,9 @@ bool ObjectSlab::is_collapse_ok(int ei)
 			}
 			//if number of intersections on either side is greater than 2, 
 			//return false because this edge is a not a good candidate for collapse
-			if(count>2)
-			{
-				return false;
-			}
-
+			if(count>2){return false;}
 		}	
 	}
-
 	return true;
 }
 
@@ -893,15 +890,13 @@ void ObjectSlab::collapseToPoint(int ei)
 	Vertex v; 
 	v.v = vi;
 	m_VertexNode.push_back(v);
-
-
+	
 	int e[3];
 
 	//twin edge
 	e[0] = m_edges[ei].twin;
 	e[1] = m_edges[e[0]].next;
 	e[2] = m_edges[e[1]].next;
-
 
 	//Delete this face
 	m_faceBool[m_edges[m_edges[ei].twin].face] = false;
@@ -920,7 +915,6 @@ void ObjectSlab::collapseToPoint(int ei)
 		m_edges[v1.e[i]].tail = vi;
 		m_edges[m_edges[v1.e[i]].twin].head = vi;
 		m_VertexNode[vi].e.push_back(v1.e[i]);
-		
 	}
 
 	for(int i = 0 ; i < v2.e.size(); i++)
@@ -929,6 +923,4 @@ void ObjectSlab::collapseToPoint(int ei)
 		m_edges[m_edges[v2.e[i]].twin].head = vi;
 		m_VertexNode[vi].e.push_back(v2.e[i]);
 	}
-	//findATwin(twin1);
-	//findATwin(twin2);
 }
