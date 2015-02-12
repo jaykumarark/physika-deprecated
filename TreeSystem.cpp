@@ -16,7 +16,7 @@ void TreeSystem::init()
 	root.l = 4.f; 
 }
 
-void TreeSystem::render(Camera cam, TrackBall* tb)
+void TreeSystem::render(Camera cam)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(glm::value_ptr(cam.projection()));

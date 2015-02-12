@@ -17,7 +17,7 @@ PObject::PObject(glm::vec3 p,
 	m_vertexFile = vertexFile;
 	m_fragmentFile = fragmentFile;
 	m_model = glm::translate(glm::mat4(1.0), p);
-	m_model = glm::scale(m_model,glm::vec3(30,30,30));
+	m_model = glm::scale(m_model,glm::vec3(50,50,50));
 	init();
 	setMaterial(a, d, s);
 
@@ -46,7 +46,7 @@ void PObject::init()
 	
 }
 
-void PObject::render(ACamera* cam, TrackBall* tb, Light* light)
+void PObject::render(ACamera* cam, Light* light)
 {
 	//Light Position
 	glm::vec4 lp = glm::vec4(light->position(), 1.f); 

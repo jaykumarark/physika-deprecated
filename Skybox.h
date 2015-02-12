@@ -6,7 +6,6 @@
 #include "VertexBufferObject.h"
 #include "ModelLoader.h"
 #include "Camera.h"
-#include "trackball.h"
 #include "Light.h"
 #include "CubeMap.h"
 

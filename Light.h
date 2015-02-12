@@ -4,7 +4,6 @@
 #include "GLSLShader.h"
 #include  "ModelLoader.h"
 #include "ACamera.h"
-#include "trackball.h"
 
 class Light
 {

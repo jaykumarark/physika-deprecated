@@ -12,7 +12,6 @@
 #include <glm\gtx\norm.hpp>
 #include <gl\glew.h>
 #include "Camera.h"
-#include "trackball.h"
 #include "PickingRay.h"
 #include "ACamera.h"
 
@@ -57,7 +56,7 @@ public:
 	int  countActiveTriangles();
 	float computeArea(int idx);		//face index is input
 	void select(float mx, float my, ACamera* cam);
-	void render(ACamera* cam, TrackBall* tb);
+	void render(ACamera* cam);
 	void idle();
 	void showAreas();
 	void setupVertexNodes();

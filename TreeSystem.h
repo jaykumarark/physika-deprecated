@@ -5,7 +5,7 @@
 #include <glm\gtc\type_ptr.hpp>
 #include <glm\gtx\rotate_vector.hpp>
 #include "camera.h"
-#include "trackball.h"
+
 #include <vector>
 
 
@@ -22,7 +22,7 @@ class TreeSystem
 public:
 	TreeSystem(void);
 	void init();
-	void render(Camera cam, TrackBall* tb);
+	void render(Camera cam);
 	void writeRules();
 	~TreeSystem(void);
 private:

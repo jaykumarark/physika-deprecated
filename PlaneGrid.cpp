@@ -131,7 +131,7 @@ void PlaneGrid::init()
 }
 
 
-void PlaneGrid::render(ACamera* cam, TrackBall* tb, Light* light)
+void PlaneGrid::render(ACamera* cam, Light* light)
 {
 	//Light Position
 	Light::LightProperties lprops = light->properties();
@@ -145,7 +145,7 @@ void PlaneGrid::render(ACamera* cam, TrackBall* tb, Light* light)
 	m_shader->setSampler("TextureSample2D", 0);
 
 	//Setting up Matrices
-	glm::mat4 m = cam->matrix() * tb->matrix() * m_model;
+	glm::mat4 m = cam->matrix() * m_model;
 	glm::mat3 NormalMatrix = glm::mat3(cam->view()*m_model);
 	NormalMatrix = glm::transpose(glm::inverse(NormalMatrix));
 

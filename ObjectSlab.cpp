@@ -48,7 +48,7 @@ void ObjectSlab::select(float mx, float my, ACamera* cam)
 	collapseTriangle(faceIndex);
 }
 
-void ObjectSlab::render(ACamera* cam, TrackBall* tb)
+void ObjectSlab::render(ACamera* cam)
 {
 
 	//m_ray->render(cam);

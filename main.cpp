@@ -7,7 +7,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 #include <math.h>
-#include "TrackBall.h"
 #include "PlaneGrid.h"
 #include "PObject.h"`
 #include "Light.h"
@@ -19,12 +18,11 @@
 #include "ObjectSlab.h"
 #include "ACamera.h"
 
-int gwidth = 1024;
-int gheight = 768;
+int gwidth = 1600;
+int gheight = 1200;
 
 Camera cam;
 ACamera* acam;
-TrackBall* trackBall;
 PlaneGrid* plane; 
 PObject* teapot;
 Light* sceneLight; 
@@ -68,7 +66,6 @@ void initOpengl()
 {
 	glEnable(GL_DEPTH_TEST);
 	initCamera();
-	trackBall			= new TrackBall(gwidth, gheight);
 	plane				= new PlaneGrid(glm::vec3(-128,0,128),
 										2, 128, 
 										"textures/floor.png",
@@ -78,16 +75,16 @@ void initOpengl()
 										glm::vec3(1.), 
 										glm::vec3(0.0));
 		
-	//terrain					= new Grid(glm::vec3(-128,0,128), 
-	//									 2, 
-	//									 50.f, 
-	//									"textures/perlin2.jpg",
-	//									"textures/grass.jpg",
-	//									"terrainVS.glsl", 
-	//									"terrainFS.glsl", 
-	//									glm::vec3(1), 
-	//									glm::vec3(1), 
-	//									glm::vec3(1));
+	terrain					= new Grid(glm::vec3(-128,0,128), 
+										 2, 
+										 50.f, 
+										"textures/perlin2.jpg",
+										"textures/grass.jpg",
+										"terrainVS.glsl", 
+										"terrainFS.glsl", 
+										glm::vec3(1), 
+										glm::vec3(1), 
+										glm::vec3(1));
 
 	sphere				= new Sphere(glm::vec3(-20,15,0),20, 20, 4, "vs.glsl", 
 												"fs.glsl",
@@ -105,8 +102,8 @@ void initOpengl()
 									  glm::vec3(0.4,1.f,0.6), 
 									  glm::vec3(0.5));
 
-	sceneLight			= new Light(20,
-									glm::vec3(0, 40, 0), 
+	sceneLight			= new Light(70,
+									glm::vec3(0, 10, 0), 
 									glm::vec3(0.2, 0.2, 0.2), 
 									glm::vec3(0.7),
 									glm::vec3(1));
@@ -122,14 +119,14 @@ void display()
 	//clear screen
 	glClearColor(.15f, .15f, .15f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//teapot->render(acam, trackBall, sceneLight); 
-	//plane->render(acam, trackBall, sceneLight);
-	//terrain->render(acam, trackBall, sceneLight);
+	//teapot->render(acam, sceneLight); 
+	//plane->render(acam, sceneLight);
+	terrain->render(acam, sceneLight);
 	sceneLight->render(acam);
 
-	//sphere->render(acam, sceneLight);
+	sphere->render(acam, sceneLight);
 
-	slab->render(acam, trackBall);
+	//slab->render(acam);
 	acam->up();
 	acam->forward();
 	//sky->render(cam);
